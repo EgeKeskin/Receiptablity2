@@ -1,0 +1,41 @@
+# Byte-compiled / virtual environment files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+*.log
+
+# Virtual environment
+venv/
+env/
+.myenv/
+
+# Django specific files
+*.sqlite3
+db.sqlite3
+/media/
+staticfiles/
+*.pot
+
+# Ignore secrets and environment variables
+.env
+*.pem
+config.json
+
+# Ignore IDE/editor files
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Ignore compiled front-end files
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ignore migrations (optional, only if regenerating migrations is preferred)
+**/migrations/**
+
+# Ignore MacOS system files
+.DS_Store
