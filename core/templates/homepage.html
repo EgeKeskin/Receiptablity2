@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'homepage-styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column min-vh-100 justify-content-center align-items-center p-0">
+    <div class="container p-4 border rounded">
+        <button class="btn btn-primary btn-lg mb-0">Join Room</button>
+        <button class="btn btn-secondary btn-lg mb-0">Make Room</button>
+        <button class="btn btn-success btn-lg mb-0">Login</button>
+    </div>
+</div>
+{% endblock %}

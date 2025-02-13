@@ -3,11 +3,80 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-    <h2>Login</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Login</button>
-    </form>
-    <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f8f9fa;
+    }
+    .card {
+        border: none;
+    }
+    .card-header {
+        background-color: #57626E;
+    }
+    .btn-primary {
+        background-color: #57626E;
+        border: none;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 75%;
+    }
+    .form-control {
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .form-control:hover {
+        border-color: #3c4858;
+    }
+    .form-control:focus {
+        border-color: #3c4858;
+        box-shadow: 0 0 5px rgba(60, 72, 88, 0.5);
+    }
+    .forgot-password {
+        text-align: right;
+        width: 75%;
+    }
+</style>
+<div class="d-flex flex-column min-vh-100 justify-content-center align-items-center">
+    <div class="d-flex mb-3">
+        <a href="{% url 'homepage' %}" class="btn btn-info me-2">Go to Homepage</a>
+        <a href="{% url 'join-room' %}" class="btn btn-info me-2">Go to Join Room</a>
+        <a href="{% url 'create-room' %}" class="btn btn-info me-2">Go to Create Room</a>
+        <a href="{% url 'in-room' %}" class="btn btn-info me-2">Go to In Room</a>
+        <a href="{% url 'payment' %}" class="btn btn-info">Go to Payment</a>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-lg">
+            <div class="card-header text-center text-white">
+                <img src="./images/receiptability.png" alt="Receiptability Logo" class="img-fluid mb-3" style="max-width: 150px;">
+                <h2>Login</h2>
+            </div>
+            <div class="card-body">
+                <form method="post" class="d-flex flex-column align-items-center">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ form.username.label_tag }}
+                        {{ form.username }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.password.label_tag }}
+                        {{ form.password }}
+                    </div>
+                    <div class="forgot-password">
+                        <a href="TO BE LINKED HERE">Forgot Password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block w-75 mt-3">Login</button>
+                </form>
+                <p class="mt-3 text-center">Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+            </div>
+        </div>
+        <footer class="text-center mt-3">
+            <p>&copy; Receiptability 2025</p>
+        </footer>
+    </div>
+</div>
 {% endblock %}

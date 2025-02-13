@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'join-room-styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 p-4 border rounded">
+    <div class="row mb-4">
+        <div class="col">
+            <input type="text" class="form-control" placeholder="Search for a room...">
+        </div>
+    </div>
+    <div class="row">
+        {% for i in range %}
+        <div class="col-md-6 mb-4">
+            <button class="btn btn-lg btn-block room-btn">Room {{ i }}</button>
+        </div>
+        <div class="col-md-6 mb-4">
+            <button class="btn btn-lg btn-block room-btn">Room {{ i|add:10 }}</button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
