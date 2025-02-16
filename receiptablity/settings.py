@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'rest_framework',
-    'ocr_app'
+    'ocr_app',
+    'receipts_app',
 ]
 
 MIDDLEWARE = [
@@ -130,5 +131,4 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 AUTHENTICATION_BACKENDS = [
     'core.auth_backends.EmailOrUsernameModelBackend',  # Ensure this is correct
-    'django.contrib.auth.backends.ModelBackend',  # Default Django authentication
 ]

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Receipt Details</title>
+</head>
+<body>
+    <h1>Receipt Details</h1>
+    <p><strong>Name:</strong> {{ receipt.name }}</p>
+    <p><strong>Total Cost:</strong> {{ receipt.total_cost }}</p>
+    <p><strong>Taxes:</strong> {{ receipt.taxes }}</p>
+    <p><strong>Tip:</strong> {{ receipt.tip }}</p>
+    <p><strong>Uploaded at:</strong> {{ receipt.uploaded_at }}</p>
+
+    <h2>Items</h2>
+    {% if receipt.receipt_items.all %}
+        <ul>
+            {% for item in receipt.receipt_items.all %}
+                <li>
+                    <p><strong>Item Name:</strong> {{ item.item_name }}</p>
+                    <p><strong>Item Cost:</strong> {{ item.item_cost }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No receipt items available.</p>
+    {% endif %}
+
+    <a href="{% url 'upload_receipt' %}">Upload Another Receipt</a>
+</body>
+</html>
