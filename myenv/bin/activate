@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/Users/egekeskin/currclasses/swe/Receiptablity2/myenv"
+VIRTUAL_ENV="/Users/egekeskin/currclasses/swe/Receiptablity2/receiptablity/myenv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
