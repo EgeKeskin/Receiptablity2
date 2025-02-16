@@ -40,6 +40,7 @@ body {
     position: relative;
     overflow: hidden;
     color: white;
+    text-decoration: none;
 }
 
 /* affects pulled from web dev proejct */
@@ -79,3 +80,4 @@ body {
 .btn-primary:hover { background-color: #3e4a56; }
 .btn-secondary:hover { background-color: #1dd3b0; }
 .btn-success:hover { background-color: #ffcc00; }
+

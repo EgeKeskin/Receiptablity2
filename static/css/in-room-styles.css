@@ -12,3 +12,7 @@ body {
 .form-range {
     width: 100%;
 }
+
+a.btn {
+    text-decoration: none;
+}

@@ -27,7 +27,7 @@ def logout_view(request):
     return redirect('login')  # Redirect to login page
 
 def home(request):
-    return render(request, 'base.html')
+    return render(request, 'front-page.html')
 
 def register(request):
     if request.method == 'POST':
