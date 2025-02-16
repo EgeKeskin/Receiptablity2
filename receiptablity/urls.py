@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
     path('', include('ocr_app.urls')),
+    path('', include('receipts_app.urls')),
 ]
