@@ -132,3 +132,9 @@ LOGOUT_REDIRECT_URL = '/login/'
 AUTHENTICATION_BACKENDS = [
     'core.auth_backends.EmailOrUsernameModelBackend',  # Ensure this is correct
 ]
+
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]

@@ -15,6 +15,9 @@ from dotenv import load_dotenv
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+# Set the Tesseract executable path
+pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'  # Update this path as needed
+
 # Endpoint for image upload that converts a receipt image into JSON using ChatGPT.
 class ReceiptImageUploadView(APIView):
     def post(self, request, *args, **kwargs):
@@ -42,6 +45,10 @@ class ReceiptImageUploadView(APIView):
                 {'error': f'Error processing OCR text: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+        # Ensure receipt_items is provided
+        if 'receipt_items' not in receipt_data:
+            receipt_data['receipt_items'] = []
 
         # Validate and save the receipt data using our serializer.
         serializer = ReceiptSerializer(data=receipt_data)
