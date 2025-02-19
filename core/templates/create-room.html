@@ -6,15 +6,21 @@
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column min-vh-100 justify-content-center align-items-center p-0">
-    <div class="container p-4 border rounded">
-        <button class="btn btn-primary btn-lg mb-3">Price Roullette</button>
-        <button class="btn btn-secondary btn-lg mb-3">Probabalistic Price Roullette</button>
-        <button class="btn btn-success btn-lg mb-3">Pay for Your Own Stuff</button>
-        <div class="mt-5"></div>
-        <button class="btn btn-info btn-lg mb-3" style="font-style: italic;">Scan Receipt</button>
-        <div class="mt-5"></div>
-        <button class="btn btn-warning btn-lg mb-3">I'm Feeling Lucky</button>
+<div class="create-room-container">
+    <div class="create-room-card">
+        <h2>Select a Pricing Strategy</h2>
+
+        <button class="custom-btn btn-dark-red">Price Roulette</button>
+        <button class="custom-btn btn-deep-green">Probabilistic Price Roulette</button>
+        <button class="custom-btn btn-muted-blue">Pay for Your Own Stuff</button>
+
+        <hr class="divider">
+
+        <button class="custom-btn btn-light-teal">Scan Receipt</button>
+
+        <hr class="divider">
+
+        <button class="custom-btn btn-lucky">I'm Feeling Lucky</button>
     </div>
 </div>
 {% endblock %}

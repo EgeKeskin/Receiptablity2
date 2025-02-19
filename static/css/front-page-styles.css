@@ -9,6 +9,22 @@ body, html {
     background-color: rgba(255, 255, 255, 0.2);
     text-align: center;
     background: linear-gradient(135deg, #541d1d, #356764);
+    animation: gradient-shift 20s infinite linear alternate;
+    background-size: 200% 200%;
+    background-position: 0% 50%;
+}
+
+
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .hero {
