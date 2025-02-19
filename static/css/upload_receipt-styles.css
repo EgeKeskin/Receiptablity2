@@ -5,9 +5,24 @@ body, html {
     min-height: 100vh;
     width: 100%;
     background: linear-gradient(135deg, #541d1d, #356764);
+    background-size: 200% 200%;
+    background-position: 0% 50%;
     display: flex;
     justify-content: center;
     align-items: center;
+    animation: gradient-shift 20s infinite linear alternate;
+}
+
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .upload-container {

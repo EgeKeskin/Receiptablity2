@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>Receipt Room - {{ receipt.name }}</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/receipt_room-styles.css' %}">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <title>Receipt Room - {{ receipt.name }}</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/receipt_room-styles.css' %}">
+    </head>
 <body>
     <div class="receipt-room-container">
         <div class="receipt-room-card">
@@ -18,18 +18,32 @@
             </div>
 
             <h2 class="receipt-room-header">Items</h2>
+            <p class="instructions">Select the items that belong to you:</p>
+
+
             {% if receipt.receipt_items.all %}
                 <ul class="receipt-room-items">
                     {% for item in receipt.receipt_items.all %}
                         <li class="receipt-room-item">
-                            <p><strong>Item Name:</strong> {{ item.item_name }}</p>
-                            <p><strong>Item Cost:</strong> {{ item.item_cost }}</p>
+                            <div class="item-container">
+                                <div class="item-details">
+                                    <p><strong>Item Name:</strong> {{ item.item_name }}</p>
+                                    <p><strong>Item Cost:</strong> {{ item.item_cost }}</p>
+                                </div>
+                                <input type="checkbox" class="custom-checkbox">
+                            </div>
                         </li>
                     {% endfor %}
                 </ul>
             {% else %}
                 <p class="receipt-room-details">No items available.</p>
             {% endif %}
+
+            <br>
+            <form action="{% url 'upload_receipt' %}" method="get">
+                <hr class="divider">
+                <button type="submit" class="upload-another-btn">Upload Another Receipt</button>
+            </form>      
         </div>
     </div>
 </body>
