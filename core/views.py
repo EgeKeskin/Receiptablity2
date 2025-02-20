@@ -54,8 +54,8 @@ def create_room(request):
     return render(request, 'create-room.html')
 
 def in_room(request):
-    names = ["Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Hank", "Ivy", "Jack"]
-    prices = [random.randint(10, 100) for _ in range(10)]
+    names = ["Alice", "Bob", "Charlie", "David", "Eve"]
+    prices = [random.randint(10, 100) for _ in range(5)]
     context = {
         'names': names,
         'prices': prices
@@ -65,3 +65,6 @@ def in_room(request):
 def payment(request):
     return render(request, 'payment.html')
 
+
+def page_testing_links(request):
+    return render(request, 'page-testing-links.html')

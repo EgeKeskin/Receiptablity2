@@ -13,26 +13,12 @@ body, html {
 }
 
 @keyframes gradient-shift {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
-.navbar {
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100;
-}
-
-.homepage-container {
+.page-links-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -41,13 +27,12 @@ body, html {
     margin-top: 80px;
 }
 
-.homepage-card {
+.page-links-card {
     background: rgba(255, 255, 255, 0.15);
-    flex-direction: column;
-    padding: 30px;
+    padding: 40px;
     border-radius: 15px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    width: 450px;
+    width: 500px;
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     text-align: center;
@@ -66,14 +51,12 @@ p {
     margin-bottom: 20px;
 }
 
-.normal-btn {
-    width: 100%;
+.page-btn {
     display: block;
-    padding: 20px 30px;
-    font-size: 1.6rem;
+    width: 100%;
+    padding: 15px;
+    font-size: 1.4rem;
     font-weight: bold;
-    text-decoration: none;
-    margin-bottom: 25px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -81,18 +64,15 @@ p {
     transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
     backdrop-filter: blur(8px);
     color: white;
+    text-align: center;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.2);
 }
 
-.normal-btn:hover {
+.page-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
     filter: brightness(1.2);
-}
-
-.normal-btn {
-    background: linear-gradient(135deg, #541d1d, #356764);
-    background-size: 200% 200%;
-    animation: gradient-shift 6s infinite linear alternate;
 }
 
 .divider {

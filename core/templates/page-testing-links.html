@@ -1,0 +1,24 @@
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/page-testing-links-styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-links-container">
+    <div class="page-links-card">
+        <h2>Page Testing Links</h2>
+        <p>Click on any button to navigate to the corresponding page.</p>
+
+        <a href="{% url 'home' %}" class="page-btn">Home</a>
+        <a href="{% url 'login' %}" class="page-btn">Login</a>
+        <a href="{% url 'logout' %}" class="page-btn">Logout</a>
+        <a href="{% url 'register' %}" class="page-btn">Register</a>
+        <a href="{% url 'homepage' %}" class="page-btn">Homepage</a>
+        <a href="{% url 'join-room' %}" class="page-btn">Join Room</a>
+        <a href="{% url 'create-room' %}" class="page-btn">Create Room</a>
+        <a href="{% url 'in-room' %}" class="page-btn">In Room</a>
+        <a href="{% url 'payment' %}" class="page-btn">Payment</a>
+    </div>
+</div>
+{% endblock %}

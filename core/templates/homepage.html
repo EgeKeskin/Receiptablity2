@@ -6,10 +6,16 @@
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column min-vh-100 justify-content-center align-items-center p-0">
-    <div class="container p-4 border rounded">
-        <button class="btn btn-primary btn-lg mb-0">Join Room</button>
-        <button class="btn btn-secondary btn-lg mb-0">Make Room</button>
+<div class="homepage-container">
+    <div class="homepage-container">
+        <div class="homepage-card">
+            <h2>Welcome to Receiptablity</h2>
+            <p>Join or create a room to get started</p>
+    
+            <a href="{% url 'join-room' %}" class="normal-btn">Join Room</a>
+            <a href="{% url 'create-room' %}" class="normal-btn">Make Room</a>
+        </div>
     </div>
+    
 </div>
 {% endblock %}
