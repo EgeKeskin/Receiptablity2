@@ -1,28 +1,50 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>Receipt Room - {{ receipt.name }}</title>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <title>Receipt Room - {{ receipt.name }}</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/receipt_room-styles.css' %}">
+    </head>
 <body>
-    <h1>Receipt: {{ receipt.name }}</h1>
-    <p><strong>Total Cost:</strong> {{ receipt.total_cost }}</p>
-    <p><strong>Taxes:</strong> {{ receipt.taxes }}</p>
-    <p><strong>Tip:</strong> {{ receipt.tip }}</p>
-    <p><strong>Uploaded at:</strong> {{ receipt.uploaded_at }}</p>
+    <div class="receipt-room-container">
+        <div class="receipt-room-card">
+            <h1 class="receipt-room-header">{{ receipt.name }}</h1>
+            <div class="receipt-room-details">
+                <p><strong>Total Cost:</strong> {{ receipt.total_cost }}</p>
+                <p><strong>Taxes:</strong> {{ receipt.taxes }}</p>
+                <p><strong>Tip:</strong> {{ receipt.tip }}</p>
+                <p><strong>Uploaded at:</strong> {{ receipt.uploaded_at }}</p>
+            </div>
 
-    <h2>Items</h2>
-    {% if receipt.receipt_items.all %}
-        <ul>
-            {% for item in receipt.receipt_items.all %}
-                <li>
-                    <strong>Item Name:</strong> {{ item.item_name }} <br>
-                    <strong>Item Cost:</strong> {{ item.item_cost }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No items available.</p>
-    {% endif %}
+            <h2 class="receipt-room-header">Items</h2>
+            <p class="instructions">Select the items that belong to you:</p>
+
+
+            {% if receipt.receipt_items.all %}
+                <ul class="receipt-room-items">
+                    {% for item in receipt.receipt_items.all %}
+                        <li class="receipt-room-item">
+                            <div class="item-container">
+                                <div class="item-details">
+                                    <p><strong>Item Name:</strong> {{ item.item_name }}</p>
+                                    <p><strong>Item Cost:</strong> {{ item.item_cost }}</p>
+                                </div>
+                                <input type="checkbox" class="custom-checkbox">
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="receipt-room-details">No items available.</p>
+            {% endif %}
+
+            <br>
+            <form action="{% url 'upload_receipt' %}" method="get">
+                <hr class="divider">
+                <button type="submit" class="upload-another-btn">Upload Another Receipt</button>
+            </form>      
+        </div>
+    </div>
 </body>
 </html>
