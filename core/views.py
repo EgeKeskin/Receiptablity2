@@ -4,6 +4,7 @@ from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .forms import *
+import random
 
 def login_view(request):
     if request.method == "POST":
@@ -26,7 +27,7 @@ def logout_view(request):
     return redirect('login')  # Redirect to login page
 
 def home(request):
-    return render(request, 'base.html')
+    return render(request, 'front-page.html')
 
 def register(request):
     if request.method == 'POST':
@@ -39,4 +40,28 @@ def register(request):
         form = RegisterForm()
 
     return render(request, 'register.html', {'form': form})
+
+def homepage(request):
+    return render(request, 'homepage.html')
+
+def join_room(request):
+    context = {
+        'range': range(1, 11)
+    }
+    return render(request, 'join-room.html', context)
+
+def create_room(request):
+    return render(request, 'create-room.html')
+
+def in_room(request):
+    names = ["Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Hank", "Ivy", "Jack"]
+    prices = [random.randint(10, 100) for _ in range(10)]
+    context = {
+        'names': names,
+        'prices': prices
+    }
+    return render(request, 'in-room.html', context)
+
+def payment(request):
+    return render(request, 'payment.html')
 

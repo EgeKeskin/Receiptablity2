@@ -131,10 +131,29 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 AUTHENTICATION_BACKENDS = [
     'core.auth_backends.EmailOrUsernameModelBackend',  # Ensure this is correct
+    'django.contrib.auth.backends.ModelBackend',  # Default Django authentication
 ]
 
+
+
+#adding the style sheets down here
+import os
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    os.path.join(BASE_DIR, 'static'),
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
