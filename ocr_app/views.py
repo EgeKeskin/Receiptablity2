@@ -6,18 +6,14 @@ from PIL import Image
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Receipt
-from .serializers import ReceiptSerializer
+from receipts_app.models import Receipt
+from receipts_app.serializers import ReceiptSerializer
+from django.contrib.auth.decorators import login_required
 from dotenv import load_dotenv
 
 # Ensure the OpenAI API key is set.
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-# Endpoint for JSON-based receipt creation.
-class ReceiptCreateView(generics.CreateAPIView):
-    queryset = Receipt.objects.all()
-    serializer_class = ReceiptSerializer
 
 # Endpoint for image upload that converts a receipt image into JSON using ChatGPT.
 class ReceiptImageUploadView(APIView):
@@ -65,9 +61,15 @@ class ReceiptImageUploadView(APIView):
             "Extract the receipt information from the following text and output valid JSON with exactly these keys: "
             "'name' (string), 'total_cost' (string or number), and 'items' (an array of objects, each having 'item_name' and 'item_cost'). "
             "Output only JSON with no extra commentary.\n\n"
+
+
+            "Extract the receipt information from the following text and output valid JSON with these keys: "
+            "'name' (string), 'total_cost' (string or number), "
+            "'taxes' (string or number, optional), 'tip' (string or number, optional), and "
+            "'items' (an array of objects, each having 'item_name' and 'item_cost'). "
+            "Output only valid JSON with no extra commentary.\n\n"
             f"Text:\n{ocr_text}"
         )
-
         response = client.chat.completions.create(model="gpt-3.5-turbo",
         messages=[
             {
