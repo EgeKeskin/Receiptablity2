@@ -1,0 +1,18 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+.list-group-item {
+    font-size: 1.2rem;
+}
+
+.form-range {
+    width: 100%;
+}
+
+a.btn {
+    text-decoration: none;
+}

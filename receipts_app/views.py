@@ -6,6 +6,7 @@ from PIL import Image
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from dotenv import load_dotenv
+import logging
 
 from receipts_app.models import Receipt
 from receipts_app.serializers import ReceiptSerializer
@@ -14,7 +15,9 @@ from receipts_app.serializers import ReceiptSerializer
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-@login_required(login_url='/login/')
+logger = logging.getLogger(__name__)
+
+# @login_required(login_url='/login/')
 def upload_receipt_view(request):
     """
     Renders a receipt upload form (GET) and processes the uploaded image (POST).
@@ -106,4 +109,5 @@ def receipt_room_view(request, receipt_id):
     This page is accessible to anyone with the correct URL.
     """
     receipt = get_object_or_404(Receipt, id=receipt_id)
+    logger.info(receipt)
     return render(request, 'receipt_room.html', {'receipt': receipt})

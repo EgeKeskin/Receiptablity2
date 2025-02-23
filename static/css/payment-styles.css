@@ -1,0 +1,21 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+.payment-amount-box {
+    background-color: #57626E;
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 2rem;
+}
+
+.payment-option-box {
+    background-color: #e9ecef;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 1.5rem;
+}
