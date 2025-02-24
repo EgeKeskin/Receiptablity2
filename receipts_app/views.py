@@ -73,9 +73,9 @@ def get_json_from_chatgpt(ocr_text):
     """
     prompt = (
         "Extract the receipt information from the following text and output valid JSON with exactly these keys: "
-        "'name' (string), 'total_cost' (string or number), and 'items' (an array of objects, each having 'item_name' and 'item_cost'). "
-        "Also include 'taxes' and 'tip' as optional keys if available. "
-        "Output only JSON with no extra commentary.\n\n"
+        "'name' (string), 'total_cost' (number), and 'items' (an array of objects, each having 'item_name' (string) and 'item_cost (number)'). "
+        "Also include 'taxes' and 'tip' (both numbers) as optional keys if available. "
+        "Output only JSON with no extra commentary. If you aren't confident about a value leave it null.\n\n"
         f"Text:\n{ocr_text}"
     )
     
