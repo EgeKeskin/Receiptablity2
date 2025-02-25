@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from dotenv import load_dotenv
 import logging
 
-from receipts_app.models import Receipt
+from receipts_app.models import Receipt, ReceiptItem
 from receipts_app.serializers import ReceiptSerializer
 
 # Load environment variables and initialize OpenAI client.
@@ -17,7 +17,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 logger = logging.getLogger(__name__)
 
-# @login_required(login_url='/login/')
+@login_required(login_url='/login/')
 def upload_receipt_view(request):
     """
     Renders a receipt upload form (GET) and processes the uploaded image (POST).
@@ -110,5 +110,27 @@ def receipt_room_view(request, receipt_id):
     """
     receipt = get_object_or_404(Receipt, id=receipt_id)
     logger.info(receipt)
-    # We want to have an if here that checks if the user logged in is equal to the receipt room owner and if so they get the owner
-    return render(request, 'receipt_room.html', {'receipt': receipt})
+    
+    if request.user.is_authenticated and receipt.owner == request.user:
+        return render(request, 'receipt_room_owner.html', {'receipt': receipt})
+    else:
+        return render(request, 'receipt_room.html', {'receipt': receipt})
+
+@login_required
+def delete_receipt_view(request, receipt_id):
+    receipt = get_object_or_404(Receipt, id=receipt_id)
+    if receipt.owner == request.user:
+        receipt.delete()
+        return redirect('homepage')
+    else:
+        return redirect('receipt_room', receipt_id=receipt_id)
+
+@login_required
+def delete_receipt_item_view(request, receipt_id, item_id):
+    receipt = get_object_or_404(Receipt, id=receipt_id)
+    if receipt.owner == request.user:
+        item = get_object_or_404(ReceiptItem, id=item_id, receipt=receipt)
+        item.delete()
+        return redirect('receipt_room_owner', receipt_id=receipt_id)
+    else:
+        return redirect('receipt_room', receipt_id=receipt_id)
