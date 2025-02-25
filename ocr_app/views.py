@@ -51,7 +51,7 @@ class ReceiptImageUploadView(APIView):
             receipt_data['receipt_items'] = []
 
         # Validate and save the receipt data using our serializer.
-        serializer = ReceiptSerializer(data=receipt_data)
+        serializer = ReceiptSerializer(data=receipt_data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
