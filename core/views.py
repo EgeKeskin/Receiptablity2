@@ -22,7 +22,6 @@ def login_view(request):
     return render(request, "login.html", {"form": form})
 
 
-
 def logout_view(request):
     logout(request)
     return redirect('login')  # Redirect to login page
@@ -39,6 +38,7 @@ def register(request):
             return redirect('home')  # Change 'home' to your desired redirect URL
     else:
         form = RegisterForm()
+
     return render(request, 'register.html', {'form': form})
 
 def homepage(request):
