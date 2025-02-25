@@ -37,11 +37,9 @@
             <p class="receipt-room-details">No items available.</p>
         {% endif %}
 
-        <br>
-        <form action="{% url 'upload_receipt' %}" method="get">
-            <hr class="divider">
-            <button type="submit" class="upload-another-btn">Confirm and Pay for Selection</button>
-        </form>      
+        <hr class="divider">
+
+        <a href="{% url 'payment' %}" class="confirm-btn">Confirm and Pay for Selection</a>
     </div>
 </div>
 {% endblock %}

@@ -1,22 +1,216 @@
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f8f9fa;
+body, html {
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    font-family: 'Roboto', sans-serif;
+    min-height: 100vh;
+    width: 100%;
+    background: linear-gradient(135deg, #541d1d, #356764);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: gradient-shift 20s infinite linear alternate;
+    background-size: 200% 200%;
 }
 
-.btn {
-    width: 600px;
-    height: 100px;
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.navbar {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.create-room-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: calc(100vh - 80px);
+    margin-top: 80px;
+}
+
+.create-room-card {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    width: 500px;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+h2 {
+    color: white;
     font-size: 2rem;
-    transition: transform 0.2s, background-color 0.2s;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
+}
+
+.custom-btn {
+    display: block;
+    text-align: center;
+    width: 100%;
+    padding: 15px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
+    backdrop-filter: blur(8px);
+    color: white;
     text-decoration: none;
 }
 
-.btn:hover {
-    transform: translateY(-5px);
-    background-color: #4a5568;
-    color: #fff;
+.btn-dark-red {
+    background: #6b2222;
+}
+
+.btn-deep-green {
+    background: #2a524b;
+}
+
+.btn-muted-blue {
+    background: #4a646c;
+}
+
+.btn-light-teal {
+    background: #5b8b91;
+}
+
+.custom-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+    filter: brightness(1.2);
+}
+
+.btn-lucky {
+    background: linear-gradient(135deg, #541d1d, #356764);
+    background-size: 200% 200%;
+    animation: gradient-shift 6s infinite linear alternate;
+}
+
+.divider {
+    width: 90%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    margin: 20px auto;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+
+
+
+/* Fun stuff https://www.w3schools.com/django/django_add_js_file.php */
+
+.custom-btn {
+    display: block;
+    text-align: center;
+    width: 100%;
+    padding: 15px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
+    backdrop-filter: blur(8px);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-lucky {
+    background: linear-gradient(135deg, #541d1d, #356764);
+    background-size: 200% 200%;
+    animation: gradient-shift 6s infinite linear alternate;
+    transition: all 1s ease-in-out;
+    position: relative;
+    z-index: 10;
+}
+
+.expand-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    font-size: 3rem;
+    border-radius: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.8s ease-in-out;
+    z-index: 999;
+}
+
+.hidden {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+
+.btn-lucky {
+    background: linear-gradient(135deg, #541d1d, #356764);
+    background-size: 200% 200%;
+    animation: lucky-colors 3s infinite alternate ease-in-out, lucky-move 4s infinite linear alternate;
+    transition: all 1s ease-in-out;
+    position: relative;
+    z-index: 10;
+}
+
+@keyframes lucky-colors {
+    0% { background: linear-gradient(135deg, #ff0000, #00ff00); }
+    25% { background: linear-gradient(135deg, #ff6600, #0099ff); }
+    50% { background: linear-gradient(135deg, #ffff00, #6600ff); }
+    75% { background: linear-gradient(135deg, #ff00ff, #00ffff); }
+    100% { background: linear-gradient(135deg, #541d1d, #356764); }
+}
+
+@keyframes lucky-move {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-10px, 10px) rotate(5deg); }
+    50% { transform: translate(10px, -10px) rotate(-5deg); }
+    75% { transform: translate(-15px, 15px) rotate(7deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.expand-crazy {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    font-size: 4rem;
+    border-radius: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 1.5s ease-in-out;
+    z-index: 999;
+    animation: explode 1.5s ease-in-out forwards;
+}
+
+@keyframes explode {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.5) translateX(-10vw) translateY(-10vh); }
+    100% { transform: scale(3) translateX(-30vw) translateY(-30vh); }
+}
+
+.hidden {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
 }
