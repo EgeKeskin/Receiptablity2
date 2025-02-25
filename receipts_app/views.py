@@ -52,7 +52,7 @@ def upload_receipt_view(request):
             return render(request, 'upload_receipt.html', context)
         
         # Validate and save the receipt data using the serializer.
-        serializer = ReceiptSerializer(data=receipt_data)
+        serializer = ReceiptSerializer(data=receipt_data, context={'request': request})
         if serializer.is_valid():
             receipt = serializer.save()
             # Redirect to the receipt room page for the created receipt.
