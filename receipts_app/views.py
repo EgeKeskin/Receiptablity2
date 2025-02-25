@@ -110,4 +110,5 @@ def receipt_room_view(request, receipt_id):
     """
     receipt = get_object_or_404(Receipt, id=receipt_id)
     logger.info(receipt)
+    # We want to have an if here that checks if the user logged in is equal to the receipt room owner and if so they get the owner
     return render(request, 'receipt_room.html', {'receipt': receipt})
