@@ -13,9 +13,6 @@ body, html {
 }
 
 
-
-
-
 .navbar {
     width: 100%;
     position: fixed;
@@ -192,4 +189,9 @@ form {
 .register-header {
     text-align: center;
     color: white;
+}
+
+.login-error {
+    color: #FF3632;
+    font-weight: bold;
 }
