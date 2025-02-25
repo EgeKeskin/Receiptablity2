@@ -2,35 +2,40 @@ body, html {
     margin: 0;
     padding: 0;
     font-family: 'Roboto', sans-serif;
-    min-height: 100vh;
+    height: 100vh;
     width: 100%;
     background: linear-gradient(135deg, #541d1d, #356764);
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     animation: gradient-shift 20s infinite linear alternate;
     background-size: 200% 200%;
+    overflow: hidden;
 }
 
 @keyframes gradient-shift {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.navbar {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
 }
 
 .receipt-room-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    flex-grow: 1;
     width: 100%;
-    height: calc(100vh - 80px);
-    margin-top: 80px;
+    height: 100vh;
+    margin-top: 50px;
+    padding-top: 20px;
 }
 
 .receipt-room-card {
@@ -38,20 +43,28 @@ body, html {
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    width: 450px;
+    width: 500px;
+    height: 85vh;
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     text-align: center;
     transition: all 0.3s ease-in-out;
-}
-/* center evrything below >>> */
-.receipt-room-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
 }
 
+.receipt-room-card::-webkit-scrollbar {
+    width: 8px;
+}
+
+.receipt-room-card::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+}
 
 .receipt-room-header {
     background: rgba(0, 0, 0, 0.5);
@@ -65,7 +78,7 @@ body, html {
     box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
     transition: transform 0.3s ease-in-out;
     width: 80%;
-    margin: 0 auto;
+    margin: 0 auto 2px auto;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -80,21 +93,46 @@ body, html {
     color: white;
     text-align: left;
     font-size: 1.1rem;
-    line-height: 1.5;
+    line-height: 1.8;
+    margin-bottom: 10px;
+}
+
+.instructions {
+    color: white;
+    font-size: 1rem;
+    margin-top: 15px;
+    margin-bottom: 1px;
+    text-align: center;
 }
 
 .receipt-room-items {
     list-style: none;
+    min-height: 200px;
     padding: 0;
     margin-top: 10px;
+    max-height: 55vh;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.receipt-room-items::-webkit-scrollbar {
+    width: 6px;
+}
+
+.receipt-room-items::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
 }
 
 .receipt-room-item {
     background: rgba(255, 255, 255, 0.2);
-    padding: 12px;
+    padding: 12px 18px;
     border-radius: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     transition: transform 0.2s, background-color 0.3s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .receipt-room-item:hover {
@@ -102,11 +140,62 @@ body, html {
     background: rgba(255, 255, 255, 0.3);
 }
 
+.item-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.item-details {
+    flex-grow: 1;
+    color: white;
+    font-size: 1rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.custom-checkbox {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    align-self: center;
+}
+
+.custom-checkbox:checked {
+    background: #e1c63f;
+    border-color: #e1c63f;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.custom-checkbox::after {
+    content: "✔";
+    font-size: 14px;
+    color: #333;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.2s ease-in-out;
+}
+
+.custom-checkbox:checked::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+
 .upload-another-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 25px;
     padding: 16px 28px;
     font-size: 1.2rem;
     font-family: 'Roboto', sans-serif;
@@ -136,65 +225,11 @@ body, html {
     box-shadow: none;
 }
 
-
 .divider {
     width: 90%;
     height: 1px;
     background: rgba(255, 255, 255, 0.3);
     border: none;
-    margin: 20px auto;
+    margin: -20px auto;
     box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-}
-
-
-.instructions {
-    color: white;
-    font-size: 1rem;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
-.item-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.item-details {
-    flex-grow: 1;
-    color: white;
-}
-
-.custom-checkbox {
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    border-radius: 5px;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    position: relative;
-}
-
-.custom-checkbox:checked {
-    background: #e1c63f;
-    border-color: #e1c63f;
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-}
-
-.custom-checkbox::after {
-    content: "✔";
-    font-size: 14px;
-    color: #333;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    transition: transform 0.2s ease-in-out;
-}
-
-.custom-checkbox:checked::after {
-    transform: translate(-50%, -50%) scale(1);
 }

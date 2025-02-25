@@ -3,10 +3,33 @@ body, html {
     padding: 0;
     font-family: 'Roboto', sans-serif;
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 100%;
     background: linear-gradient(135deg, #541d1d, #356764);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: gradient-shift 20s infinite linear alternate;
+    background-size: 200% 200%;
+}
+
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.navbar {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
 }
 
 .join-container {
@@ -33,11 +56,24 @@ body, html {
 h2 {
     color: white;
     font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.instructions {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.search-bar-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
     margin-bottom: 20px;
 }
 
 .search-bar {
-    width: 100%;
+    width: 90%;
     padding: 12px;
     border-radius: 8px;
     border: none;
@@ -57,41 +93,42 @@ h2 {
     background: rgba(255, 255, 255, 0.3);
 }
 
-.room-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.room-btn {
+.room-lists {
+    display: flex;
+    justify-content: space-between;
     width: 100%;
-    padding: 20px;
-    font-size: 1.3rem;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: center;
+    margin-top: 10px;
+}
+
+.room-list-section {
+    width: 45%;
+}
+
+.room-list-title {
     color: white;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(8px);
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.room-list {
+    list-style: none;
+    padding: 0;
+}
+
+.room-list-item {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
     transition: transform 0.2s, background-color 0.3s;
-}
-
-.room-btn:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.3);
-}
-
-
-.container {
-    max-width: 800px;
-}
-
-.list-group-item {
+    color: white;
+    text-align: center;
     cursor: pointer;
+    backdrop-filter: blur(8px);
 }
 
-.list-group-item:hover {
-    background-color: #f0f0f0;
+.room-list-item:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.25);
 }
