@@ -20,26 +20,28 @@
         <p class="instructions">Select the items that belong to you:</p>
 
         {% if receipt.receipt_items.all %}
-            <ul class="receipt-room-items">
-                {% for item in receipt.receipt_items.all %}
-                    <li class="receipt-room-item">
-                        <div class="item-container">
-                            <div class="item-details">
-                                <p><strong>Item Name:</strong> {{ item.item_name }}</p>
-                                <p><strong>Item Cost:</strong> {{ item.item_cost }}</p>
+            <form id="receipt-form" method="POST" action="{% url 'payment' %}">
+                {% csrf_token %}
+                <ul class="receipt-room-items">
+                    {% for item in receipt.receipt_items.all %}
+                        <li class="receipt-room-item">
+                            <div class="item-container">
+                                <div class="item-details">
+                                    <p><strong>Item Name:</strong> {{ item.item_name }}</p>
+                                    <p><strong>Item Cost:</strong> {{ item.item_cost }}</p>
+                                </div>
+                                <input type="checkbox" class="custom-checkbox" name="selected_items" value="{{ item.item_cost }}">
                             </div>
-                            <input type="checkbox" class="custom-checkbox">
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <button type="submit" class="confirm-btn">Confirm and Pay for Selection</button>
+            </form>
         {% else %}
             <p class="receipt-room-details">No items available.</p>
         {% endif %}
 
         <hr class="divider">
-
-        <a href="{% url 'payment' %}" class="confirm-btn">Confirm and Pay for Selection</a>
     </div>
 </div>
 {% endblock %}

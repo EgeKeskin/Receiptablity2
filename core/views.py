@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .forms import *
 import random
+from django.views.decorators.csrf import csrf_exempt
 
 def login_view(request):
     if request.method == "POST":
@@ -62,6 +63,14 @@ def in_room(request):
     }
     return render(request, 'in-room.html', context)
 
+@csrf_exempt
 def payment(request):
+    if request.method == "POST":
+        selected_items = request.POST.getlist('selected_items')
+        total_cost = sum(float(item) for item in selected_items)
+        context = {
+            'total_cost': total_cost
+        }
+        return render(request, 'payment.html', context)
     return render(request, 'payment.html')
 
