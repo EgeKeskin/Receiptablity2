@@ -13,6 +13,15 @@
         <div class="login-header">
             <img src="{% static 'images/receiptability.png' %}" alt="Receiptability Logo" class="logo">
             <h2>Login</h2>
+            <div class="login-error">
+                {% if form.errors %}
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                                <p>{{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}  
+            </div>
         </div>
         <div class="login-body">
             <form method="post">

@@ -193,3 +193,8 @@ form {
     text-align: center;
     color: white;
 }
+
+.login-error  {
+    color: red !important;
+    font-weight: bold !important;
+}
