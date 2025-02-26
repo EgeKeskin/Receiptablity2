@@ -137,3 +137,54 @@ h2 {
     margin: 30px auto;
     box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
+
+
+.payment-option-box {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    color: white;
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s, background-color 0.3s;
+    cursor: pointer;
+    margin-bottom: 25px;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.payment-option-box:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.cash-payment-btn {
+    background: rgba(34, 139, 34, 0.4); 
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    color: white;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 25px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.cash-payment-btn:hover {
+    background: rgba(50, 205, 50, 0.6);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+.cash-payment-btn:active {
+    transform: scale(0.97);
+}

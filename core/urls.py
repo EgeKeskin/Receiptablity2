@@ -11,4 +11,5 @@ urlpatterns = [
     path('create-room/', create_room, name='create-room'),
     path('in-room/', in_room, name='in-room'),
     path('payment/', payment, name='payment'),
+    path('congratulations/', congratulations, name='congratulations'),
 ]
