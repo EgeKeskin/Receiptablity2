@@ -13,7 +13,7 @@ Name your repository using the following format:
 &lt;Mutaz&gt;
 
 ## Objectives
-&lt;Description of what your project is about, your key functionalities, tech stacks used, etc. &gt;
+&lt;Receiptability is a full service web application that enables users to scan and itemize receipts. The app then allows users to join "Tables" where they can split and itemize each receipt. Underlying the app, there is a software that gamifies the splitting of the receipt, enabling the users to take risks on payment in exchange to potential pay more or less than their order. Our app uses OCR and AI technology to scan each receipt. Django is the primary tech stak our group utilized.&gt;
 
 ## How to Run
 &lt;Instructions for how to run your project. Include the URI to your project at the top if applicable.&gt;
