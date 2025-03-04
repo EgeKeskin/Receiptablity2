@@ -6,13 +6,16 @@ from PIL import Image
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from dotenv import load_dotenv
+import logging
 
-from receipts_app.models import Receipt
+from receipts_app.models import Receipt, ReceiptItem
 from receipts_app.serializers import ReceiptSerializer
 
 # Load environment variables and initialize OpenAI client.
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+logger = logging.getLogger(__name__)
 
 @login_required(login_url='/login/')
 def upload_receipt_view(request):
@@ -49,7 +52,7 @@ def upload_receipt_view(request):
             return render(request, 'upload_receipt.html', context)
         
         # Validate and save the receipt data using the serializer.
-        serializer = ReceiptSerializer(data=receipt_data)
+        serializer = ReceiptSerializer(data=receipt_data, context={'request': request})
         if serializer.is_valid():
             receipt = serializer.save()
             # Redirect to the receipt room page for the created receipt.
@@ -70,9 +73,9 @@ def get_json_from_chatgpt(ocr_text):
     """
     prompt = (
         "Extract the receipt information from the following text and output valid JSON with exactly these keys: "
-        "'name' (string), 'total_cost' (string or number), and 'items' (an array of objects, each having 'item_name' and 'item_cost'). "
-        "Also include 'taxes' and 'tip' as optional keys if available. "
-        "Output only JSON with no extra commentary.\n\n"
+        "'name' (string), 'total_cost' (number), and 'items' (an array of objects, each having 'item_name' (string) and 'item_cost (number)'). "
+        "Also include 'taxes' and 'tip' (both numbers) as optional keys if available. "
+        "Output only JSON with no extra commentary. If you aren't confident about a value leave it null.\n\n"
         f"Text:\n{ocr_text}"
     )
     
@@ -106,4 +109,28 @@ def receipt_room_view(request, receipt_id):
     This page is accessible to anyone with the correct URL.
     """
     receipt = get_object_or_404(Receipt, id=receipt_id)
-    return render(request, 'receipt_room.html', {'receipt': receipt})
+    logger.info(receipt)
+    
+    if request.user.is_authenticated and receipt.owner == request.user:
+        return render(request, 'receipt_room_owner.html', {'receipt': receipt})
+    else:
+        return render(request, 'receipt_room.html', {'receipt': receipt})
+
+@login_required
+def delete_receipt_view(request, receipt_id):
+    receipt = get_object_or_404(Receipt, id=receipt_id)
+    if receipt.owner == request.user:
+        receipt.delete()
+        return redirect('homepage')
+    else:
+        return redirect('receipt_room', receipt_id=receipt_id)
+
+@login_required
+def delete_receipt_item_view(request, receipt_id, item_id):
+    receipt = get_object_or_404(Receipt, id=receipt_id)
+    if receipt.owner == request.user:
+        item = get_object_or_404(ReceiptItem, id=item_id, receipt=receipt)
+        item.delete()
+        return redirect('receipt_room_owner', receipt_id=receipt_id)
+    else:
+        return redirect('receipt_room', receipt_id=receipt_id)

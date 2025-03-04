@@ -1,11 +1,50 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Register{% endblock %}
 
 {% block content %}
-  <h2>Register</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button>
-  </form>
-  <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/login-styles.css' %}">
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <img src="{% static 'images/receiptability.png' %}" alt="Receiptability Logo" class="logo">
+            <h2>Register</h2>
+            <div class="login-error">
+                {% if form.errors %}
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                                <p>{{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}  
+            </div>
+        </div>
+        <div class="login-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="input-group">
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                </div>
+                <div class="input-group">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                </div>
+                <div class="input-group">
+                    {{ form.password1.label_tag }}
+                    {{ form.password1 }}
+                </div>
+                <div class="input-group">
+                    {{ form.password2.label_tag }}
+                    {{ form.password2 }}
+                </div>
+                <button type="submit" class="btn">Register</button>
+            </form>
+            <p class="register-link">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+        </div>
+    </div>
+</div>
 {% endblock %}

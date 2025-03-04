@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/create-room-styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="create-room-container">
+    <div class="create-room-card" id="room-card">
+        <h2>Select a Pricing Strategy</h2>
+
+        <a href="{% url 'upload_receipt' %}" class="custom-btn btn-dark-red">Price Roulette</a>
+        <a href="{% url 'upload_receipt' %}" class="custom-btn btn-deep-green">Probabilistic Price Roulette</a>
+        <a href="{% url 'upload_receipt' %}" class="custom-btn btn-muted-blue">Pay for Your Own Stuff</a>
+
+        <hr class="divider">
+
+        <a href="{% url 'upload_receipt' %}" class="custom-btn btn-light-teal">Scan Receipt</a>
+
+        <hr class="divider">
+
+        <a href="{% url 'upload_receipt' %}" class="custom-btn btn-lucky" id="lucky-btn">I'm Feeling Lucky</a>
+    </div>
+</div>
+<!-- source -->
+<!-- https://www.w3schools.com/django/django_add_js_file.php -->
+<script>
+    document.getElementById('lucky-btn').addEventListener('click', function(event) {
+        event.preventDefault(); 
+        let luckyBtn = document.getElementById('lucky-btn');
+        let roomCard = document.getElementById('room-card');
+
+
+        roomCard.classList.add('hidden');  
+        luckyBtn.classList.add('expand-crazy');
+
+        setTimeout(() => {
+            window.location.href = luckyBtn.href; 
+        }, 2000);
+    });
+</script>
+{% endblock %}

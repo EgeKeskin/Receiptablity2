@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/homepage-styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="homepage-container">
+    <div class="homepage-container">
+        <div class="homepage-card">
+            <h2>Welcome to Receiptablity</h2>
+            <p>Join or create a room to get started</p>
+    
+            <a href="{% url 'join-room' %}" class="normal-btn">Join Room</a>
+            <a href="{% url 'create-room' %}" class="normal-btn">Make Room</a>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

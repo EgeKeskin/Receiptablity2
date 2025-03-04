@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/congratulations-styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="congratulations-container">
+    <h1 class="congratulations-text">🎉 Congratulations, you have paid! 🎉</h1>
+    <p class="lawyer-text">Don't worry, you don't owe anyone anything, we won't come after you - <br> <span class="lawyer-name">Our Lawyer, Sawyer</span></p>
+    <a href="{% url 'homepage' %}" class="btn btn-info">Return to Homepage</a>
+</div>
+<div class="receipt-emoji">🧾</div>
+<script>
+    document.addEventListener("mousemove", (event) => {
+    const receiptEmoji = document.querySelector(".receipt-emoji");
+    receiptEmoji.style.left = `${event.clientX}px`;
+    receiptEmoji.style.top = `${event.clientY}px`;
+});
+</script>
+{% endblock %}

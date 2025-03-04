@@ -1,0 +1,109 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    height: 100vh;
+    width: 100%;
+    background: linear-gradient(135deg, #541d1d, #356764);
+    animation: gradient-shift 20s infinite linear alternate;
+    background-size: 200% 200%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    text-align: center;
+    position: relative;
+}
+
+.navbar {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.congratulations-container {
+    text-align: center;
+    z-index: 2;
+}
+
+.congratulations-text {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #ffeb3b;
+    text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+    animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.lawyer-text {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 20px;
+    animation: slow-shrink-grow 4s infinite ease-in-out;
+}
+
+@keyframes slow-shrink-grow {
+    0% { transform: scale(1); }
+    80% { transform: scale(0.9); }
+    100% { transform: scale(1.2); }
+}
+
+.lawyer-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #e1c63f;
+    display: inline-block;
+    transition: transform 0.2s ease-in-out;
+}
+
+.lawyer-name:hover {
+    transform: rotate(-5deg) scale(1.2);
+}
+
+.btn-info {
+    display: inline-block;
+    background: #2a524b;
+    border: none;
+    padding: 16px 28px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    text-decoration: none;
+    margin-top: 25px;
+}
+
+.btn-info:hover {
+    background: #3b6a5d;
+    transform: scale(1.05);
+}
+
+.btn-info:active {
+    transform: scale(0.98);
+}
+
+.receipt-emoji {
+    position: absolute;
+    width: 40px; 
+    height: 40px;
+    font-size: 2rem;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+

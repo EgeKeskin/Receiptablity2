@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome | Receiptability</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/front-page-styles.css' %}">
+</head>
+<body>
+
+    <div class="hero">
+        <div class="overlay"></div>
+        <div class="content">
+            <img src="{% static 'images/receiptability.png' %}" alt="Receiptability Logo" class="logo">
+            <h1>Welcome to Receiptability</h1>
+            <p>Make paying fun again.</p>
+            <div class="buttons">
+                <a href="{% url 'join-room' %}" class="btn btn-primary">Join Room</a>
+                <a href="{% url 'create-room' %}" class="btn btn-secondary">Make Room</a>
+                <a href="{% url 'login' %}" class="btn btn-success">Login</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

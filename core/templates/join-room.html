@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/join-room-styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="join-container">
+    <div class="join-card">
+        <h2>Join a Room</h2>
+        <p class="instructions">Search for a room or select from the available rooms below:</p>
+        <div class="search-bar-container">
+            <input type="text" id="search-bar" class="search-bar" placeholder="Search for a room...">
+        </div>
+
+        <div class="room-lists">
+            <div class="room-list-section">
+                <h3 class="room-list-title">Available Rooms:</h3>
+                <ul class="room-list" id="available-rooms">
+                    {% for room in rooms %}
+                    <li class="room-list-item">{{ room.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="room-list-section">
+                <h3 class="room-list-title">Your Rooms:</h3>
+                <ul class="room-list" id="user-rooms">
+                    {% for room in user_rooms %}
+                    <li class="room-list-item">{{ room.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('search-bar').addEventListener('input', function() {
+    var filter = this.value.toLowerCase();
+    var availableRooms = document.getElementById('available-rooms').getElementsByTagName('li');
+    var userRooms = document.getElementById('user-rooms').getElementsByTagName('li');
+
+    Array.from(availableRooms).forEach(function(room) {
+        var text = room.textContent || room.innerText;
+        room.style.display = text.toLowerCase().indexOf(filter) > -1 ? '' : 'none';
+    });
+
+    Array.from(userRooms).forEach(function(room) {
+        var text = room.textContent || room.innerText;
+        room.style.display = text.toLowerCase().indexOf(filter) > -1 ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

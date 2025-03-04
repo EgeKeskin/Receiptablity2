@@ -4,20 +4,23 @@ from receipts_app.models import Receipt, ReceiptItem
 class ReceiptItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReceiptItem
-        fields = ['id', 'item_name', 'item_cost']
+        fields = ['item_name', 'item_cost']
 
 class ReceiptSerializer(serializers.ModelSerializer):
-    # Expose ReceiptItem objects via the field "items" (sourced from receipt_items)
-    items = ReceiptItemSerializer(many=True, source='receipt_items')
+    # Add a hidden field for the owner.
+    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    # Map input "items" to the receipt_items related field.
+    items = ReceiptItemSerializer(many=True, source='receipt_items', required=False)
 
     class Meta:
         model = Receipt
-        fields = ['id', 'name', 'total_cost', 'taxes', 'tip', 'items', 'uploaded_at']
+        # Note: "items" is now a virtual field (source='receipt_items') so we don't include a separate JSONField.
+        fields = ['id', 'owner', 'name', 'total_cost', 'taxes', 'tip', 'uploaded_at', 'items']
 
     def create(self, validated_data):
-        # Pop the nested receipt_items data (passed in as "items")
-        items_data = validated_data.pop('receipt_items', [])
+        # Pop the nested data using the source key "receipt_items"
+        receipt_items_data = validated_data.pop('receipt_items', [])
         receipt = Receipt.objects.create(**validated_data)
-        for item_data in items_data:
+        for item_data in receipt_items_data:
             ReceiptItem.objects.create(receipt=receipt, **item_data)
         return receipt
