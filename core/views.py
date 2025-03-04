@@ -74,3 +74,6 @@ def payment(request):
         return render(request, 'payment.html', context)
     return render(request, 'payment.html')
 
+def congratulations(request):
+    return render(request, 'congratulations.html')
+
