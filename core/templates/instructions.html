@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/instructions-styles.css' %}">
+{% endblock %}
+
+{% block title %}Instructions{% endblock %}
+
+{% block content %}
+<div class="join-container">
+    <div class="join-card">
+        <h2>How to Use Our Site</h2>
+        <p>Follow these steps to get started:</p>
+        <ol>
+            <li>
+                <h3>Login or Register</h3>
+                <p>
+                    If you already have an account, click on the <strong>Login</strong> button at the top right corner 
+                    and enter your credentials. If you don’t have an account, click on <strong>Register</strong> 
+                    and fill out the sign-up form. <em>You must be logged in to create a room.</em>
+                </p>
+            </li>
+            <li>
+                <h3>Create a Room &amp; Upload a Receipt</h3>
+                <p>
+                    Once you’re logged in, click on the <strong>Make Room</strong> option to create a new room. 
+                    Here, you can upload an image of your receipt. Our system will process the receipt and display 
+                    its details in a unique "receipt room" page.
+                </p>
+            </li>
+            <li>
+                <h3>Share the Receipt Link</h3>
+                <p>
+                    After your receipt is processed, copy the URL from your browser’s address bar and share it with 
+                    anyone who needs to view the receipt details. They can visit that link to see the receipt 
+                    information without logging in.
+                </p>
+            </li>
+        </ol>
+    </div>
+</div>
+{% endblock %}
