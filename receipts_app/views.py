@@ -21,47 +21,52 @@ logger = logging.getLogger(__name__)
 def upload_receipt_view(request):
     """
     Renders a receipt upload form (GET) and processes the uploaded image (POST).
-    Calls the OCR and ChatGPT helper to extract receipt data,
-    saves the Receipt via the serializer, and then redirects to the corresponding receipt room.
+    Accepts room_type from query string or form input.
     """
     context = {}
-    
+
     if request.method == 'POST':
         receipt_image = request.FILES.get('receipt_image')
+        room_type = request.POST.get('room_type', 'custom_split')
+
         if not receipt_image:
             context['error'] = "No image file provided."
+            context['room_type'] = room_type  # preserve value on error
             return render(request, 'upload_receipt.html', context)
-        
+
         try:
-            # Open the image using Pillow.
             image = Image.open(receipt_image)
         except Exception:
             context['error'] = "Invalid image file."
+            context['room_type'] = room_type
             return render(request, 'upload_receipt.html', context)
-        
-        # Extract text using pytesseract.
+
         extracted_text = pytesseract.image_to_string(image)
-        print("Extracted Text:", extracted_text)  # Debug log
-        
-        # Call helper function to get structured JSON from ChatGPT.
+        print("Extracted Text:", extracted_text)
+
         try:
             receipt_data = get_json_from_chatgpt(extracted_text)
-            print("Parsed Receipt Data from ChatGPT:", receipt_data)  # Debug log
+            print("Parsed Receipt Data from ChatGPT:", receipt_data)
         except Exception as e:
             context['error'] = f"Error processing OCR text: {str(e)}"
+            context['room_type'] = room_type
             return render(request, 'upload_receipt.html', context)
-        
-        # Validate and save the receipt data using the serializer.
+
+        # Inject room_type manually
+        receipt_data['room_type'] = room_type
+
         serializer = ReceiptSerializer(data=receipt_data, context={'request': request})
         if serializer.is_valid():
             receipt = serializer.save()
-            # Redirect to the receipt room page for the created receipt.
             return redirect('receipt_room', receipt_id=receipt.id)
         else:
             context['error'] = serializer.errors
+            context['room_type'] = room_type
             return render(request, 'upload_receipt.html', context)
-    
-    # GET request: render the upload form.
+
+    # GET: populate room_type from query string
+    room_type = request.GET.get('room_type', 'custom_split')
+    context['room_type'] = room_type
     return render(request, 'upload_receipt.html', context)
 
 
@@ -115,6 +120,45 @@ def receipt_room_view(request, receipt_id):
         return render(request, 'receipt_room_owner.html', {'receipt': receipt})
     else:
         return render(request, 'receipt_room.html', {'receipt': receipt})
+    
+def receipt_room_view(request, receipt_id):
+    """
+    Retrieves the Receipt by its UUID and renders a page showing all receipt details and related items.
+    The template varies depending on ownership and room_type field on the Receipt.
+    """
+    receipt = get_object_or_404(Receipt, id=receipt_id)
+    room_type = receipt.room_type
+    is_owner = request.user.is_authenticated and receipt.owner == request.user
+    print(room_type)
+    template_map = {
+        'roulette': {
+            'owner': 'roulette_room.html',
+            'guest': 'roulette_ropm.html',
+        },
+        'split_evenly': {
+            'owner': 'receipt_room_owner_split.html',
+            'guest': 'receipt_room_split.html',
+        },
+        'custom_split': {
+            'owner': 'receipt_room_owner.html',
+            'guest': 'receipt_room.html',
+        },
+        'probabalistic_roulette': {
+            'owner': 'receipt_room_owner_probabalistic.html',
+            'guest': 'receipt_room_probabalistic.html',
+        },
+        'default': {
+            'owner': 'receipt_room_owner.html',
+            'guest': 'receipt_room.html',
+        }
+    }
+
+    template = template_map.get(room_type, template_map['default'])
+    template_name = template['owner'] if is_owner else template['guest']
+
+    return render(request, template_name, {
+        'receipt': receipt
+    })
 
 @login_required
 def delete_receipt_view(request, receipt_id):

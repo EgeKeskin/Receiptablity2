@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/receipt_room-styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="receipt-room-container">
+    <div class="receipt-room-card">
+        <h1 class="receipt-room-header">{{ receipt.name }}</h1>
+        <div class="receipt-room-details">
+            <p><strong>Total Cost:</strong> {{ receipt.total_cost }}</p>
+            <p><strong>Taxes:</strong> {{ receipt.taxes }}</p>
+            <p><strong>Tip:</strong> {{ receipt.tip }}</p>
+            <p><strong>Uploaded at:</strong> {{ receipt.uploaded_at }}</p>
+        </div>
+
+        <h2 class="receipt-room-header">Items</h2>
+        <p class="instructions">These are the items on the receipt. One person will be randomly selected to pay for all.</p>
+
+        {% if receipt.receipt_items.all %}
+            <ul class="receipt-room-items">
+                {% for item in receipt.receipt_items.all %}
+                    <li class="receipt-room-item">
+                        <div class="item-container">
+                            <div class="item-details">
+                                <p><strong>Item Name:</strong> {{ item.item_name }}</p>
+                                <p><strong>Item Cost:</strong> {{ item.item_cost }}</p>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <form id="roulette-form" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="total_cost" value="{{ receipt.total_cost }}">
+
+                <div class="input-group mt-4">
+                    <label class="upload-label" for="names">Enter Names (comma-separated):</label>
+                    <input type="text" name="names" id="namesInput" class="upload-input" placeholder="e.g. Alice, Bob, Charlie" required>
+                </div>
+
+                <button type="submit" class="confirm-btn">Spin Roulette and Pay</button>
+            </form>
+        {% else %}
+            <p class="receipt-room-details">No items available.</p>
+        {% endif %}
+
+        <hr class="divider">
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  console.log("🎯 Script loaded!");
+
+  const form = document.getElementById('roulette-form');
+  console.log("📄 Form found:", form);
+
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      console.log("🌀 Form submitted!");
+
+      const namesInput = document.getElementById('namesInput');
+      const costInput = document.querySelector('input[name="total_cost"]');
+
+      const namesRaw = namesInput?.value || "";
+
+      const names = namesRaw.split(',').map(n => n.trim()).filter(n => n);
+
+      const cost = parseFloat(costInput?.value || "0");
+
+      if (names.length < 2 || isNaN(cost)) {
+        alert("⚠️ Please enter at least two names and a valid cost.");
+        return;
+      }
+
+      const chosenOne = names[Math.floor(Math.random() * names.length)];
+
+      alert(`🎉 ${chosenOne} pays $${cost.toFixed(2)}!`);
+    });
+  } else {
+    console.warn("⚠️ Form not found! JS ran before form existed.");
+  }
+</script>
+{% endblock %}
+
