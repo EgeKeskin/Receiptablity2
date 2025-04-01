@@ -171,6 +171,17 @@ def receipt_room_owner_view(request, receipt_id):
     else:
         return redirect('receipt_room', receipt_id=receipt_id)
 
+@login_required
+def receipt_room_owner_probabalistic_view(request, receipt_id):
+    """
+    Retrieves the Receipt by its UUID and renders the owner-specific page for probabilistic roulette.
+    """
+    receipt = get_object_or_404(Receipt, id=receipt_id)
+    if receipt.owner == request.user:
+        return render(request, 'receipt_room_owner_probabalistic.html', {'receipt': receipt})
+    else:
+        return redirect('receipt_room', receipt_id=receipt_id)
+
 def add_participant(request, receipt_id):
     receipt = get_object_or_404(Receipt, id=receipt_id)
 
