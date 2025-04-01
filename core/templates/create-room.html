@@ -9,18 +9,18 @@
 <div class="create-room-container">
     <div class="create-room-card" id="room-card">
         <h2>Select a Pricing Strategy</h2>
-
-        <a href="{% url 'upload_receipt' %}" class="custom-btn btn-dark-red">Price Roulette</a>
-        <a href="{% url 'upload_receipt' %}" class="custom-btn btn-deep-green">Probabilistic Price Roulette</a>
-        <a href="{% url 'upload_receipt' %}" class="custom-btn btn-muted-blue">Pay for Your Own Stuff</a>
-
+        
+        <a href="{% url 'upload_receipt' %}?room_type=roulette" class="custom-btn btn-dark-red">Price Roulette</a>
+        <a href="{% url 'upload_receipt' %}?room_type=probabalistic_roulette" class="custom-btn btn-deep-green">Probabilistic Price Roulette</a>
+        <a href="{% url 'upload_receipt' %}?room_type=custom_split" class="custom-btn btn-muted-blue">Pay for Your Own Stuff</a>
+        
         <hr class="divider">
-
-        <a href="{% url 'upload_receipt' %}" class="custom-btn btn-light-teal">Scan Receipt</a>
-
+        
+        <a href="{% url 'upload_receipt' %}?room_type=split_evenly" class="custom-btn btn-light-teal">Split Evenly</a>
+        
         <hr class="divider">
-
-        <a href="{% url 'upload_receipt' %}" class="custom-btn btn-lucky" id="lucky-btn">I'm Feeling Lucky</a>
+        
+        <a href="{% url 'upload_receipt' %}?room_type=roulette" class="custom-btn btn-lucky" id="lucky-btn">I'm Feeling Lucky</a>
     </div>
 </div>
 <!-- source -->

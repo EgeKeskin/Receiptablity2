@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from .forms import *
 import random
 from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
 
 def login_view(request):
     if request.method == "POST":
@@ -73,4 +74,8 @@ def payment(request):
         }
         return render(request, 'payment.html', context)
     return render(request, 'payment.html')
+
+
+def congratulations(request):
+    return render(request, 'congratulations.html')
 

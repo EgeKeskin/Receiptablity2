@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/receipt_room-styles.css' %}">
+<style>
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .modal-content {
+    background: white;
+    color: black;
+    margin: 15% auto;
+    padding: 30px 40px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-content h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1a1a1a;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+  }
+
+  .close-btn:hover {
+    color: #000;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="receipt-room-container">
+  <div class="receipt-room-card">
+    <h1 class="receipt-room-header">{{ receipt.name }}</h1>
+    <div class="receipt-room-details">
+      <p><strong>Total Cost:</strong> {{ receipt.total_cost }}</p>
+      <p><strong>Taxes:</strong> {{ receipt.taxes }}</p>
+      <p><strong>Tip:</strong> {{ receipt.tip }}</p>
+      <p><strong>Uploaded at:</strong> {{ receipt.uploaded_at }}</p>
+    </div>
+
+    <h2 class="receipt-room-header">Items</h2>
+    <p class="instructions">This bill will be split evenly. Enter how many people are paying.</p>
+
+    {% if receipt.receipt_items.all %}
+      <ul class="receipt-room-items">
+        {% for item in receipt.receipt_items.all %}
+          <li class="receipt-room-item">
+            <div class="item-container">
+              <div class="item-details">
+                <p><strong>Item Name:</strong> {{ item.item_name }}</p>
+                <p><strong>Item Cost:</strong> {{ item.item_cost }}</p>
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <!-- Split Form -->
+      <form id="split-evenly-form">
+        <input type="hidden" id="totalCostInput" value="{{ receipt.total_cost }}">
+        <div class="input-group mt-4">
+          <label class="upload-label" for="numPeopleInput">How many people?</label>
+          <input type="number" id="numPeopleInput" class="upload-input" placeholder="e.g. 3" min="1" required>
+        </div>
+        <button type="submit" class="confirm-btn mt-3">Split Evenly</button>
+      </form>
+    {% else %}
+      <p class="receipt-room-details">No items available.</p>
+    {% endif %}
+
+    <hr class="divider">
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="splitModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeModal">&times;</span>
+    <h2 id="modalMessage">💸 Each person pays...</h2>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('split-evenly-form');
+    const modal = document.getElementById('splitModal');
+    const modalMessage = document.getElementById('modalMessage');
+    const closeModal = document.getElementById('closeModal');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const total = parseFloat(document.getElementById('totalCostInput').value || "0");
+      const numPeople = parseInt(document.getElementById('numPeopleInput').value || "0");
+
+      if (isNaN(total) || isNaN(numPeople) || numPeople <= 0) {
+        alert("⚠️ Please enter a valid number of people and cost.");
+        return;
+      }
+
+      const amount = total / numPeople;
+      modalMessage.textContent = `💸 Each person pays $${amount.toFixed(2)}!`;
+      modal.style.display = 'block';
+    });
+
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  });
+</script>
+{% endblock %}

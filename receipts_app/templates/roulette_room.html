@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/receipt_room-styles.css' %}">
+<style>
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .modal-content {
+    background: white;
+    color: black;
+    margin: 15% auto;
+    padding: 30px 40px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-content h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1a1a1a;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+  }
+
+  .close-btn:hover {
+    color: #000;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="receipt-room-container">
+  <div class="receipt-room-card">
+    <h1 class="receipt-room-header">{{ receipt.name }}</h1>
+    <div class="receipt-room-details">
+      <p><strong>Total Cost:</strong> {{ receipt.total_cost }}</p>
+      <p><strong>Taxes:</strong> {{ receipt.taxes }}</p>
+      <p><strong>Tip:</strong> {{ receipt.tip }}</p>
+      <p><strong>Uploaded at:</strong> {{ receipt.uploaded_at }}</p>
+    </div>
+
+    <h2 class="receipt-room-header">Items</h2>
+    <p class="instructions">One person will be randomly selected to pay for all. Enter everyone's names below.</p>
+
+    {% if receipt.receipt_items.all %}
+      <ul class="receipt-room-items">
+        {% for item in receipt.receipt_items.all %}
+          <li class="receipt-room-item">
+            <div class="item-container">
+              <div class="item-details">
+                <p><strong>Item Name:</strong> {{ item.item_name }}</p>
+                <p><strong>Item Cost:</strong> {{ item.item_cost }}</p>
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <form id="roulette-form">
+        <input type="hidden" id="totalCostInput" value="{{ receipt.total_cost }}">
+        <div class="input-group mt-4">
+          <label class="upload-label" for="namesInput">Enter Names (comma-separated):</label>
+          <input type="text" id="namesInput" class="upload-input" placeholder="e.g. Alice, Bob, Charlie" required>
+        </div>
+        <button type="submit" class="confirm-btn mt-3">Spin Roulette and Pay</button>
+      </form>
+    {% else %}
+      <p class="receipt-room-details">No items available.</p>
+    {% endif %}
+
+    <hr class="divider">
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="rouletteModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeModal">&times;</span>
+    <h2 id="modalMessage">🎉 Someone pays!</h2>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('roulette-form');
+    const modal = document.getElementById('rouletteModal');
+    const modalMessage = document.getElementById('modalMessage');
+    const closeModal = document.getElementById('closeModal');
+
+    form?.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const namesRaw = document.getElementById('namesInput').value || "";
+      const names = namesRaw.split(',').map(n => n.trim()).filter(n => n);
+      const total = parseFloat(document.getElementById('totalCostInput').value || "0");
+
+      if (names.length < 2 || isNaN(total)) {
+        alert("⚠️ Please enter at least two names and a valid cost.");
+        return;
+      }
+
+      const chosenOne = names[Math.floor(Math.random() * names.length)];
+      modalMessage.textContent = `🎉 ${chosenOne} pays $${total.toFixed(2)}!`;
+      modal.style.display = 'block';
+    });
+
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  });
+</script>
+{% endblock %}
