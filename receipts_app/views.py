@@ -107,19 +107,6 @@ def get_json_from_chatgpt(ocr_text):
     
     return receipt_data
 
-
-def receipt_room_view(request, receipt_id):
-    """
-    Retrieves the Receipt by its UUID and renders a page showing all receipt details and related items.
-    This page is accessible to anyone with the correct URL.
-    """
-    receipt = get_object_or_404(Receipt, id=receipt_id)
-    logger.info(receipt)
-    
-    if request.user.is_authenticated and receipt.owner == request.user:
-        return render(request, 'receipt_room_owner.html', {'receipt': receipt})
-    else:
-        return render(request, 'receipt_room.html', {'receipt': receipt})
     
 def receipt_room_view(request, receipt_id):
     """

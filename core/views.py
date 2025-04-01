@@ -75,23 +75,6 @@ def payment(request):
         return render(request, 'payment.html', context)
     return render(request, 'payment.html')
 
-@csrf_exempt
-def roulette_payment(request):
-    if request.method == "POST":
-        names_raw = request.POST.get('names', '')
-        names = [name.strip() for name in names_raw.split(',') if name.strip()]
-        total_cost = float(request.POST.get('total_cost', 0))
-
-        chosen_one = random.choice(names) if names else None
-        print(chosen_one)
-        print(names)
-        return render(request, 'roulette_payment.html', {
-            'total_cost': total_cost,
-            'chosen_one': chosen_one,
-            'names': names
-        })
-
-    return render(request, 'payment.html')
 
 def congratulations(request):
     return render(request, 'congratulations.html')
