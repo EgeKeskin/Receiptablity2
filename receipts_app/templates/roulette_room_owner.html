@@ -266,7 +266,6 @@
         index % 2 === 0 ? "#541d1d" : "#356764" // Use theme colors
       );
 
-      // Create chart
       if (myChart) myChart.destroy();
       myChart = new Chart(wheel, {
         plugins: [ChartDataLabels],
@@ -308,7 +307,7 @@
     spinBtn.addEventListener('click', () => {
       spinBtn.disabled = true;
       finalValue.textContent = "Spinning...";
-      let randomDegree = Math.floor(Math.random() * 360);
+      const randomDegree = Math.floor(Math.random() * 360);
 
       let rotationInterval = setInterval(() => {
         myChart.options.rotation = (myChart.options.rotation || 0) + resultValue;
@@ -322,46 +321,39 @@
           resultValue -= 1;
         } else if (myChart.options.rotation >= randomDegree) {
           clearInterval(rotationInterval);
+
+          // Determine the selected name based on the arrow position
           const selectedName = rotationValues.find(
             (r) =>
               randomDegree >= r.minDegree && randomDegree <= r.maxDegree
           ).value;
+
+          // Highlight the selected section
+          const selectedIndex = rotationValues.findIndex(
+            (r) =>
+              randomDegree >= r.minDegree && randomDegree <= r.maxDegree
+          );
+          myChart.data.datasets[0].backgroundColor[selectedIndex] = "#ffeb3b"; // Bright yellow
+          myChart.update();
+
+          // Add glowing effect
+          wheel.style.boxShadow = "0 0 20px 10px rgba(255, 235, 59, 0.8)";
+
           finalValue.innerHTML = `<p>🎉 ${selectedName} pays $${totalCost.toFixed(
             2
           )}!</p>`;
-          spinBtn.disabled = false;
+
+          // Hide the spin button after spinning
+          spinBtn.style.display = 'none';
+
           resultValue = 101;
+
+          // Remove glow after 3 seconds
+          setTimeout(() => {
+            wheel.style.boxShadow = "none";
+          }, 3000);
         }
       }, 10);
-    });
-
-    const form = document.getElementById('roulette-form');
-    const modal = document.getElementById('rouletteModal');
-    const modalMessage = document.getElementById('modalMessage');
-    const closeModal = document.getElementById('closeModal');
-
-    if (!form) return;
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      const namesRaw = document.getElementById('namesInput').value || "";
-      const names = namesRaw.split(',').map(n => n.trim()).filter(n => n);
-      const total = parseFloat(document.getElementById('totalCostInput').value || "0");
-
-      if (names.length < 2 || isNaN(total)) {
-        alert("⚠️ Please enter at least two names and a valid cost.");
-        return;
-      }
-
-      const chosenOne = names[Math.floor(Math.random() * names.length)];
-      modalMessage.textContent = `🎉 ${chosenOne} pays $${total.toFixed(2)}!`;
-      modal.style.display = 'block';
-    });
-
-    closeModal.addEventListener('click', () => modal.style.display = 'none');
-    window.addEventListener('click', (e) => {
-      if (e.target === modal) modal.style.display = 'none';
     });
   });
 
