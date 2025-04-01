@@ -129,11 +129,10 @@ def receipt_room_view(request, receipt_id):
     receipt = get_object_or_404(Receipt, id=receipt_id)
     room_type = receipt.room_type
     is_owner = request.user.is_authenticated and receipt.owner == request.user
-    print(room_type)
     template_map = {
         'roulette': {
-            'owner': 'roulette_room.html',
-            'guest': 'roulette_ropm.html',
+            'owner': 'roulette_room_owner.html',
+            'guest': 'roulette_room.html',
         },
         'split_evenly': {
             'owner': 'receipt_room_owner_split.html',

@@ -72,12 +72,10 @@
                 <p><strong>Item Name:</strong> {{ item.item_name }}</p>
                 <p><strong>Item Cost:</strong> {{ item.item_cost }}</p>
               </div>
-
               <form method="POST">
                 {% csrf_token %}
                 <button type="submit" class="edit-btn"></button>
               </form>
-
               <form method="POST">
                 {% csrf_token %}
                 <button type="submit" class="delete-btn">X</button>
@@ -89,18 +87,16 @@
 
       <form id="roulette-form">
         <input type="hidden" id="totalCostInput" value="{{ receipt.total_cost }}">
-
         <div class="input-group mt-4">
           <label class="upload-label" for="names">Enter Names (comma-separated):</label>
           <input type="text" id="namesInput" class="upload-input" placeholder="e.g. Alice, Bob, Charlie" required>
         </div>
-
-        <button type="submit" class="confirm-btn">Spin Roulette and Pay</button>
+        <button type="submit" class="confirm-btn mt-3">Spin Roulette and Pay</button>
       </form>
 
       <form method="POST" action="{% url 'delete_receipt' receipt.id %}">
         {% csrf_token %}
-        <button type="submit" class="confirm-btn">Delete Room</button>
+        <button type="submit" class="confirm-btn mt-3">Delete Room</button>
       </form>
     {% else %}
       <p class="receipt-room-details">No items available.</p>
@@ -110,7 +106,7 @@
   </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal Popup -->
 <div id="rouletteModal" class="modal">
   <div class="modal-content">
     <span class="close-btn" id="closeModal">&times;</span>
