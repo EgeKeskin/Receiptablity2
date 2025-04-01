@@ -182,12 +182,6 @@
           <button type="submit" class="confirm-btn mt-3">Split Evenly</button>
         </div>
       </form>
-
-      <!-- Delete Room Form -->
-      <form method="POST">
-        {% csrf_token %}
-        <button type="submit" class="confirm-btn mt-3">Delete Room</button>
-      </form>
     
 
     <form id="payment-form" method="POST" action="{% url 'payment' %}">
