@@ -8,23 +8,32 @@
 {% block content %}
 <div class="payment-container">
     <div class="payment-card">
-        <h2>You Owe: </h2>
+        <h2>You Owe:</h2>
         <div class="payment-amount-box text-center">
             <h2>${{ total_cost }}</h2>
         </div>
 
         <h2 class="mt-4">Select Payment Method</h2>
+
+        {% if receipt.owner.venmo %}
         <div class="payment-option-box text-center">
-            <h3>USER's Venmo</h3>
+            <h3>
+                <a href="https://venmo.com/{{ receipt.owner.venmo }}" target="_blank">
+                    💸 Pay {{ receipt.owner.username }} on Venmo (@{{ receipt.owner.venmo }})
+                </a>
+            </h3>
         </div>
+        {% else %}
         <div class="payment-option-box text-center">
-            <h3>🍎 USER's Apple Pay 🍎</h3>
+            <h3>{{ receipt.owner.username }} has not provided a Venmo username.</h3>
         </div>
+        {% endif %}
+
         <a href="{% url 'congratulations' %}" class="cash-payment-btn text-center">
             💵 Pay with Cash 💵
         </a>
-        <hr class="divider">
 
+        <hr class="divider">
         <a href="{% url 'join-room' %}" class="btn btn-info">Go to Join Room</a>
     </div>
 </div>
