@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from .views import instructions  # Import the instructions view
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -13,6 +14,7 @@ urlpatterns = [
     path('in-room/', in_room, name='in-room'),
     path('payment/', payment, name='payment'),
     path('congratulations/', congratulations, name='congratulations'),
+    path('instructions/', instructions, name='instructions'),  # Add this line
     path('password_reset/', 
          auth_views.PasswordResetView.as_view(template_name='password_reset_form.html'), 
          name='password_reset'),

@@ -300,7 +300,7 @@
               <form method="POST" action="/edit_receipt_item/${receiptId}/${newItem.id}/"
                     class="edit-form" id="edit-form-${newItem.id}" style="display: inline-flex;">
                 <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
-                <input type="hidden" name="current_page" value="receipt_room_owner_split">
+                <input type="hidden" name="current_page" value="receipt_room_owner_probabalistic">
                 <input type="text" name="item_name" value="${newItem.item_name}" class="edit-input" placeholder="Item Name">
                 <input type="text" name="item_cost" value="${newItem.item_cost}" class="edit-input" placeholder="Item Price">
                 <button type="submit" class="confirm-edit-btn">✔</button>

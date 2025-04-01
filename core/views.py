@@ -87,3 +87,6 @@ def payment(request):
 def congratulations(request):
     return render(request, 'congratulations.html')
 
+def instructions(request):
+    return render(request, 'instructions.html')
+

@@ -222,6 +222,12 @@ def add_participant(request, receipt_id):
 @login_required
 def run_probabilistic_split_view(request, receipt_id):
     receipt = get_object_or_404(Receipt, id=receipt_id)
+    
+    # Recalculate the total cost dynamically
+    item_total = sum(item.item_cost or Decimal(0) for item in receipt.receipt_items.all())
+    receipt.total_cost = item_total + (receipt.taxes or Decimal(0)) + (receipt.tip or Decimal(0))
+    receipt.save()
+
     participants = list(receipt.participants.all())
 
     if len(participants) < (receipt.number_of_people or 0):
