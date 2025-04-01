@@ -3,12 +3,81 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/receipt_room_owner-styles.css' %}">
+<style>
+  
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+  }
+  .modal-content {
+    background: white;
+    color: black;
+    margin: 15% auto;
+    padding: 30px 40px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+  .modal-content h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1a1a1a;
+  }
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+  }
+  .close-btn:hover {
+    color: #000;
+  }
+
+  /* Updated Edit Receipt Details Button
+     Matching the confirm-btn style from earlier files */
+  .edit-receipt-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 28px;
+    font-size: 1.2rem;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    background: rgba(34, 34, 34, 0.7);
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    backdrop-filter: blur(8px);
+    margin-top: 10px;
+    min-width: 250px;
+  }
+  .edit-receipt-btn:hover {
+    background: rgba(51, 51, 51, 0.85);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+  }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="receipt-room-container">
   <div class="receipt-room-card">
-    <h2 class="receipt-room-header">[Owner View]</h2>
+    <h2 class="receipt-room-header">~Owner View~</h2>
     <h1 class="receipt-room-header">{{ receipt.name }}</h1>
     
     <div class="receipt-room-details">
@@ -20,21 +89,21 @@
     </div>
     
     <form method="POST" action="{% url 'edit_receipt_details' receipt.id %}" id="receipt-edit-form" class="receipt-edit-form" style="display: none;">
-        {% csrf_token %}
-        <div class="form-group">
-          <label for="receipt-name">Restaurant Name:</label>
-          <input type="text" id="receipt-name" name="receipt_name" value="{{ receipt.name }}">
-        </div>
-        <div class="form-group">
-          <label for="taxes">Taxes:</label>
-          <input type="text" id="taxes" name="taxes" value="{{ receipt.taxes }}">
-        </div>
-        <div class="form-group">
-          <label for="tip">Tip:</label>
-          <input type="text" id="tip" name="tip" value="{{ receipt.tip }}">
-        </div>
-        <button type="submit" class="confirm-edit-btn">Save Changes</button>
-      </form>
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="receipt-name">Restaurant Name:</label>
+        <input type="text" id="receipt-name" name="receipt_name" value="{{ receipt.name }}">
+      </div>
+      <div class="form-group">
+        <label for="taxes">Taxes:</label>
+        <input type="text" id="taxes" name="taxes" value="{{ receipt.taxes }}">
+      </div>
+      <div class="form-group">
+        <label for="tip">Tip:</label>
+        <input type="text" id="tip" name="tip" value="{{ receipt.tip }}">
+      </div>
+      <button type="submit" class="confirm-edit-btn">Save Changes</button>
+    </form>
     
     <h2 class="receipt-room-header">Items</h2>
     <p class="instructions">Select the items that belong to you:</p>
@@ -72,10 +141,8 @@
       <p class="receipt-room-details">No items available.</p>
     {% endif %}
 
-    
     <button type="button" class="confirm-btn" onclick="addNewItem()">Add New Item</button>
 
-    
     <form id="payment-form" method="POST" action="{% url 'payment' %}">
       {% csrf_token %}
     </form>
@@ -86,7 +153,6 @@
     </form>
 
     <hr class="divider">
-  </div>
   </div>
 </div>
 
@@ -132,9 +198,6 @@
       if (data.success) {
         const newItem = data.item;
         const itemList = document.getElementById("receipt-items-list");
-
-       
-        
         const newItemElement = document.createElement("li");
         newItemElement.className = "receipt-room-item";
         newItemElement.id = `item-${newItem.id}`;
