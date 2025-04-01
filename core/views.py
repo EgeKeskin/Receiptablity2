@@ -7,6 +7,7 @@ from .forms import *
 import random
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
+from receipts_app.models import Receipt
 
 def login_view(request):
     if request.method == "POST":
@@ -47,10 +48,17 @@ def homepage(request):
     return render(request, 'homepage.html')
 
 def join_room(request):
-    context = {
-        'range': range(1, 11)
-    }
-    return render(request, 'join-room.html', context)
+    if request.user.is_authenticated:
+        all_rooms = Receipt.objects.exclude(owner=request.user).order_by('-uploaded_at')[:9]
+        user_rooms = Receipt.objects.filter(owner=request.user).order_by('-uploaded_at')[:9]
+    else:
+        all_rooms = Receipt.objects.all().order_by('-uploaded_at')[:9]
+        user_rooms = None
+
+    return render(request, 'join-room.html', {
+        'rooms': all_rooms,
+        'user_rooms': user_rooms,
+    })
 
 def create_room(request):
     return render(request, 'create-room.html')
