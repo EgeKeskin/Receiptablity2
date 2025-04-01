@@ -12,6 +12,7 @@ from django.http import JsonResponse
 from .models import Receipt, RoomParticipant
 from decimal import Decimal, ROUND_HALF_UP
 import random
+from collections import deque
 
 from receipts_app.models import Receipt, ReceiptItem
 from receipts_app.serializers import ReceiptSerializer
@@ -229,7 +230,7 @@ def add_participant(request, receipt_id):
                 participant.save()
                 return redirect('receipt_room', receipt_id=receipt.id)
             except Exception as e:
-                print(f"Error saving participant: {e}")  # Optional: log error
+                print(f"Error saving participant: {e}") 
 
     return render(request, 'add_participant.html', {
         'receipt': receipt,
@@ -244,54 +245,60 @@ def run_probabilistic_split_view(request, receipt_id):
     if len(participants) < (receipt.number_of_people or 0):
         return redirect('receipt_room', receipt_id=receipt_id)
 
+    participants.sort(key=lambda p: float(p.price_ceiling)) 
+
     total_cost = float(receipt.total_cost or 0)
     cost_left = total_cost
     assignments = []
 
-    # Clone the list of participants to iterate through without modifying the original
-    unassigned = participants[:]
+    for i, p in enumerate(participants):
+        is_last = (i == len(participants) - 1)
 
-    while unassigned:
-        p = unassigned.pop(0)
-
-        # If total cost has already been covered, assign $0 to remaining participants
         if cost_left <= 0:
-            assignments.append({
-                "name": p.name,
-                "paid": Decimal(0).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP),
-                "ceiling": p.price_ceiling,
-                "initial_prob": p.willingness_to_pay,
-                "random_roll": None
-            })
-            continue
-
-        # Compute remaining weighted average
-        remaining_weight = sum(u.willingness_to_pay * float(u.price_ceiling) for u in unassigned)
-        if remaining_weight > 0 and len(unassigned) > 0:
-            weighted_avg = cost_left / remaining_weight
+            paid = 0
+            rand = None
+        elif is_last:
+            paid = min(cost_left, float(p.price_ceiling))
+            rand = None
         else:
-            weighted_avg = 0
+            rand = random.random()
+            paid = float(p.price_ceiling) if rand <= p.willingness_to_pay else 0
 
-        # Roll for payment
-        rand = random.random()
-        prob = p.willingness_to_pay
-        pay_amount = min(float(p.price_ceiling), cost_left) if rand <= prob else 0
-
+        paid_decimal = Decimal(paid).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
         assignments.append({
             "name": p.name,
-            "paid": Decimal(pay_amount).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP),
+            "paid": paid_decimal,
             "ceiling": p.price_ceiling,
-            "initial_prob": prob,
-            "random_roll": round(rand, 3)
+            "initial_prob": p.willingness_to_pay,
+            "random_roll": round(rand, 3) if rand is not None else "Forced"
         })
 
-        cost_left -= pay_amount
+        cost_left -= float(paid_decimal)
 
-        # Adjust willingness for remaining participants
-        if cost_left > 0 and unassigned:
-            for u in unassigned:
-                new_prob = cost_left / (float(u.price_ceiling) * len(unassigned))
-                u.willingness_to_pay = min(round(new_prob, 3), 1.0)
+        remaining = participants[i+1:]
+        if cost_left > 0 and remaining:
+            for r in remaining:
+                new_prob = cost_left / (float(r.price_ceiling) * len(remaining))
+                r.willingness_to_pay = min(round(new_prob, 3), 1.0)
+
+    paid_total = sum(a['paid'] for a in assignments)
+    overflow = Decimal(total_cost).quantize(Decimal("0.01")) - paid_total
+
+    if abs(overflow) >= Decimal("0.01"):
+        def roll_sort_key(a):
+            roll = a['random_roll']
+            return roll if isinstance(roll, float) else 1.0 
+
+        sorted_candidates = sorted(assignments, key=roll_sort_key)
+
+        for a in sorted_candidates:
+            if overflow <= Decimal("0.00"):
+                break
+            max_addable = Decimal(a['ceiling']) - a['paid']
+            if max_addable > 0:
+                to_add = min(overflow, max_addable)
+                a['paid'] += to_add.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+                overflow -= to_add
 
     return render(request, 'probabilistic_result.html', {
         'receipt': receipt,
