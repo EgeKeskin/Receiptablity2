@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+{% load receipt_filters %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/upload_receipt-styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="upload-container">
+    <div class="upload-card">
+        <h1 class="upload-header">Upload Receipt</h1>
+
+        {% if room_type %}
+            <p class="upload-label">Room Type: <strong>{{ room_type|humanize_room_type }}</strong></p>
+        {% endif %}
+
+        {% if error %}
+            <p class="upload-error">{{ error }}</p>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="upload-form">
+            {% csrf_token %}
+
+            <label for="receipt_image" class="upload-label">Select Receipt Image:</label>
+            <input type="file" name="receipt_image" id="receipt_image" accept="image/*" class="upload-input" required>
+
+            <label for="number_of_people" class="upload-label mt-3">Number of People at the Table:</label>
+            <input type="number" name="number_of_people" id="number_of_people" class="upload-input" min="1" required>
+
+            <!-- Pass room_type as a hidden field -->
+            <input type="hidden" name="room_type" value="{{ room_type }}">
+
+            <button type="submit" class="upload-btn mt-3">Upload Receipt</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

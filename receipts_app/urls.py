@@ -14,4 +14,7 @@ urlpatterns = [
     path('edit_receipt_details/<uuid:receipt_id>/', edit_receipt_details_view, name='edit_receipt_details'),
     path('add_receipt_item/<uuid:receipt_id>/', add_receipt_item_view, name='add_receipt_item'),
     path('roulette_room_owner/<uuid:receipt_id>/', receipt_room_owner_view, name='roulette_room_owner'),
+    path('receipt/<uuid:receipt_id>/add-participant/', add_participant, name='add_participant'),
+    path('receipt/<uuid:receipt_id>/run-probabilistic/', run_probabilistic_split_view, name='run_probabilistic_split')
+
 ]

@@ -10,6 +10,7 @@ class Receipt(models.Model):
         ('custom_split', 'Custom Split'),
         ('probabalistic_roulette', 'Probabalistic Roulette')
     ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -25,8 +26,11 @@ class Receipt(models.Model):
     uploaded_at = models.DateTimeField(default=timezone.now)
     room_type = models.CharField(max_length=50, choices=ROOM_TYPE_CHOICES, default='custom_split')
 
+    number_of_people = models.PositiveIntegerField(null=True, blank=True)
+
     def __str__(self):
         return self.name
+
 
 class ReceiptItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -36,3 +40,13 @@ class ReceiptItem(models.Model):
 
     def __str__(self):
         return self.item_name
+    
+class RoomParticipant(models.Model):
+    receipt = models.ForeignKey('Receipt', related_name='participants', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    name = models.CharField(max_length=100)  # fallback if user is null
+    willingness_to_pay = models.FloatField()  # between 0 and 1
+    price_ceiling = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.name or str(self.user)

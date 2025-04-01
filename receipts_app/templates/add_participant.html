@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+  .input-group { margin-bottom: 1rem; }
+  label { display: block; font-weight: 500; margin-bottom: 0.3rem; }
+  input[type="range"] { width: 100%; }
+  input[type="text"] {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  .value-display {
+    font-weight: bold;
+    color: #00ffc8;
+    margin-left: 0.5rem;
+  }
+  .effective-weight {
+    font-size: 1.1rem;
+    margin-top: 1rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="receipt-room-container">
+  <div class="receipt-room-card">
+    <h1 class="receipt-room-header">{{ receipt.name }}</h1>
+    <p class="instructions">Adjust the sliders to indicate how much you're willing to pay and your price ceiling:</p>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="input-group">
+        <label for="name">Your Name:</label>
+        <input type="text" name="name" id="name" required>
+      </div>
+
+      <div class="input-group">
+        <label for="willingness_to_pay">Willingness to Pay:
+          <span class="value-display" id="wtpVal">1.000</span>
+        </label>
+        <input type="range" min="0.001" max="1.000" step="0.001"
+               name="willingness_to_pay" id="wtpSlider" value="1.000">
+      </div>
+
+      <div class="input-group">
+        <label for="price_ceiling">Price Ceiling ($):
+          <span class="value-display" id="ceilingVal">{{ default_ceiling|floatformat:2 }}</span>
+        </label>
+        <input type="range"
+               min="0.01"
+               max="{{ receipt.total_cost }}"
+               step="0.01"
+               name="price_ceiling"
+               id="ceilingSlider"
+               value="{{ default_ceiling|floatformat:2 }}">
+      </div>
+
+      <input type="hidden" id="numPeople" value="{{ receipt.number_of_people|default:1 }}">
+      <input type="hidden" id="totalCost" value="{{ receipt.total_cost }}">
+      <input type="hidden" id="minEffectiveWeight" value="{{ default_ceiling|floatformat:2 }}">
+
+      <div class="effective-weight">
+        🧠 Effective Weight: <strong><span id="effectiveWeight">{{ default_ceiling|floatformat:2 }}</span></strong>
+      </div>
+
+      <button type="submit" class="confirm-btn mt-3">Submit</button>
+    </form>
+
+    <hr class="divider">
+    <a href="{% url 'receipt_room' receipt.id %}">Back to Room</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const wtpSlider = document.getElementById('wtpSlider');
+  const ceilingSlider = document.getElementById('ceilingSlider');
+  const wtpVal = document.getElementById('wtpVal');
+  const ceilingVal = document.getElementById('ceilingVal');
+  const effectiveWeightDisplay = document.getElementById('effectiveWeight');
+
+  const numPeople = parseInt(document.getElementById('numPeople').value);
+  const totalCost = parseFloat(document.getElementById('totalCost').value);
+  const minWeight = totalCost / numPeople;
+
+  function update(triggeredBy) {
+    let wtp = parseFloat(wtpSlider.value);
+    let ceiling = parseFloat(ceilingSlider.value);
+    let weight = wtp * ceiling;
+
+    if (triggeredBy === 'wtp') {
+      if (weight < minWeight) {
+        wtp = minWeight / ceiling;
+        wtp = Math.min(Math.max(wtp, 0.001), 1);
+        wtpSlider.value = wtp.toFixed(3);
+      }
+    }
+
+    if (triggeredBy === 'ceiling') {
+      if (weight < minWeight) {
+        ceiling = minWeight / wtp;
+        ceiling = Math.min(Math.max(ceiling, 0.01), totalCost);
+        ceilingSlider.value = ceiling.toFixed(2);
+      }
+    }
+
+    // Update display values
+    wtp = parseFloat(wtpSlider.value);
+    ceiling = parseFloat(ceilingSlider.value);
+    effectiveWeightDisplay.textContent = (wtp * ceiling).toFixed(2);
+    wtpVal.textContent = wtp.toFixed(3);
+    ceilingVal.textContent = ceiling.toFixed(2);
+  }
+
+  wtpSlider.addEventListener('input', () => update('wtp'));
+  ceilingSlider.addEventListener('input', () => update('ceiling'));
+  update();
+});
+</script>
+{% endblock %}

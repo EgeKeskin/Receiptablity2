@@ -3,54 +3,104 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/join-room-styles.css' %}">
+<style>
+  .room-list-item {
+    padding: 0.75rem 1rem;
+    background-color: rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    color: #f9f9f9;
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+  }
+
+  .room-list-item:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .room-list-item.muted {
+    color: #bbb;
+    font-style: italic;
+    background: transparent;
+    text-align: center;
+    cursor: default;
+  }
+
+  .room-list-title {
+    margin-bottom: 0.6rem;
+    color: #f1f1f1;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="join-container">
-    <div class="join-card">
-        <h2>Join a Room</h2>
-        <p class="instructions">Search for a room or select from the available rooms below:</p>
-        <div class="search-bar-container">
-            <input type="text" id="search-bar" class="search-bar" placeholder="Search for a room...">
-        </div>
+  <div class="join-card">
+    <h2>Join a Room</h2>
+    <p class="instructions">Search for a room or select from the available rooms below:</p>
 
-        <div class="room-lists">
-            <div class="room-list-section">
-                <h3 class="room-list-title">Available Rooms:</h3>
-                <ul class="room-list" id="available-rooms">
-                    {% for room in rooms %}
-                    <li class="room-list-item">{{ room.name }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <div class="room-list-section">
-                <h3 class="room-list-title">Your Rooms:</h3>
-                <ul class="room-list" id="user-rooms">
-                    {% for room in user_rooms %}
-                    <li class="room-list-item">{{ room.name }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
+    <div class="search-bar-container">
+      <input type="text" id="search-bar" class="search-bar" placeholder="Search for a room...">
     </div>
+
+    <div class="room-lists">
+      <div class="room-list-section">
+        <h3 class="room-list-title">Available Rooms:</h3>
+        <ul class="room-list" id="available-rooms">
+          {% for room in rooms %}
+            <li class="room-list-item" data-href="{% url 'receipt_room' room.id %}">
+              {{ room.name|default:"Untitled Room" }}
+            </li>
+          {% empty %}
+            <li class="room-list-item muted">No available rooms.</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      {% if user_rooms %}
+      <div class="room-list-section">
+        <h3 class="room-list-title">Your Rooms:</h3>
+        <ul class="room-list" id="user-rooms">
+          {% for room in user_rooms %}
+            <li class="room-list-item" data-href="{% url 'receipt_room' room.id %}">
+              {{ room.name|default:"Untitled Room" }}
+            </li>
+          {% empty %}
+            <li class="room-list-item muted">You have no rooms yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-document.getElementById('search-bar').addEventListener('input', function() {
-    var filter = this.value.toLowerCase();
-    var availableRooms = document.getElementById('available-rooms').getElementsByTagName('li');
-    var userRooms = document.getElementById('user-rooms').getElementsByTagName('li');
-
-    Array.from(availableRooms).forEach(function(room) {
-        var text = room.textContent || room.innerText;
-        room.style.display = text.toLowerCase().indexOf(filter) > -1 ? '' : 'none';
+  // Filter rooms based on search input
+  document.getElementById('search-bar').addEventListener('input', function() {
+    const filter = this.value.toLowerCase();
+    ['available-rooms', 'user-rooms'].forEach(function(listId) {
+      const section = document.getElementById(listId);
+      if (!section) return;
+      const items = section.getElementsByTagName('li');
+      Array.from(items).forEach(function(item) {
+        const text = item.textContent || item.innerText;
+        item.style.display = text.toLowerCase().includes(filter) ? '' : 'none';
+      });
     });
+  });
 
-    Array.from(userRooms).forEach(function(room) {
-        var text = room.textContent || room.innerText;
-        room.style.display = text.toLowerCase().indexOf(filter) > -1 ? '' : 'none';
+  // Make list items clickable
+  document.querySelectorAll('.room-list-item[data-href]').forEach(item => {
+    item.addEventListener('click', () => {
+      const href = item.getAttribute('data-href');
+      if (href) window.location.href = href;
     });
-});
+  });
 </script>
 {% endblock %}
