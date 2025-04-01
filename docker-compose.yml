@@ -1,9 +1,11 @@
-version: '3.8'
-
 services:
   web:
     build: .
     container_name: receiptablity
+    env_file:
+      - .env
+    environment:
+      - USE_DOCKER=1
     volumes:
       - .:/receiptablity
     ports:

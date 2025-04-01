@@ -17,6 +17,12 @@ from collections import deque
 from receipts_app.models import Receipt, ReceiptItem
 from receipts_app.serializers import ReceiptSerializer
 
+if os.environ.get('USE_DOCKER') == '1':
+    pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+else:
+    pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'  # your local path
+
+
 # Load environment variables and initialize OpenAI client.
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
