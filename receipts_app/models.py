@@ -20,13 +20,14 @@ class Receipt(models.Model):
         blank=True
     )
     name = models.CharField(max_length=255, null=True, blank=True)
-    total_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    taxes = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    tip = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    total_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0.00)
+    taxes = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0.00)
+    tip = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0.00)
     uploaded_at = models.DateTimeField(default=timezone.now)
     room_type = models.CharField(max_length=50, choices=ROOM_TYPE_CHOICES, default='custom_split')
-
     number_of_people = models.PositiveIntegerField(null=True, blank=True)
+
+    venmo = models.CharField(max_length=100, null=True, blank=True)  
 
     def __str__(self):
         return self.name
