@@ -96,3 +96,6 @@ def congratulations(request):
 def instructions(request):
     return render(request, 'instructions.html')
 
+def eula(request):
+    return render(request, 'eula.html')
+
