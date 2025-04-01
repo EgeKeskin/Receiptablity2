@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import login, logout
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from .forms import *
 import random
@@ -76,12 +76,18 @@ def in_room(request):
 def payment(request):
     if request.method == "POST":
         selected_items = request.POST.getlist('selected_items')
+        receipt_id = request.POST.get('receipt_id')  # ✅ Get the passed receipt ID
+
+        receipt = get_object_or_404(Receipt, id=receipt_id)
         total_cost = sum(float(item) for item in selected_items)
+
         context = {
-            'total_cost': total_cost
+            'total_cost': round(total_cost, 2),
+            'receipt': receipt  # ✅ So you can access receipt.owner.venmo etc. in the template
         }
         return render(request, 'payment.html', context)
-    return render(request, 'payment.html')
+
+    return render(request, 'payment.html')  # fallback for GET
 
 
 def congratulations(request):

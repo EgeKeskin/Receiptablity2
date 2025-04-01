@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 def upload_receipt_view(request):
     """
     Renders a receipt upload form (GET) and processes the uploaded image (POST).
-    Accepts room_type from query string or form input.
+    Chooses the template dynamically based on room_type.
     """
     context = {}
     room_type = request.GET.get('room_type', 'custom_split')
@@ -35,18 +35,27 @@ def upload_receipt_view(request):
         receipt_image = request.FILES.get('receipt_image')
         room_type = request.POST.get('room_type', 'custom_split')
         number_of_people = request.POST.get('number_of_people')
+        venmo = request.POST.get('venmo')
+
+        # Determine which template to use
+        if room_type == 'probabalistic_roulette':
+            template = 'upload_receipt_probabalistic.html'
+        elif room_type == 'custom_split':
+            template = 'upload_custom_split.html'
+        else:
+            template = 'upload_receipt.html'
 
         if not receipt_image:
             context['error'] = "No image file provided."
             context['room_type'] = room_type
-            return render(request, 'upload_receipt_probabalistic.html' if room_type == 'probabalistic_roulette' else 'upload_receipt.html', context)
+            return render(request, template, context)
 
         try:
             image = Image.open(receipt_image)
         except Exception:
             context['error'] = "Invalid image file."
             context['room_type'] = room_type
-            return render(request, 'upload_receipt_probabalistic.html' if room_type == 'probabalistic_roulette' else 'upload_receipt.html', context)
+            return render(request, template, context)
 
         extracted_text = pytesseract.image_to_string(image)
         print("Extracted Text:", extracted_text)
@@ -57,12 +66,14 @@ def upload_receipt_view(request):
         except Exception as e:
             context['error'] = f"Error processing OCR text: {str(e)}"
             context['room_type'] = room_type
-            return render(request, 'upload_receipt_probabalistic.html' if room_type == 'probabalistic_roulette' else 'upload_receipt.html', context)
+            return render(request, template, context)
 
+        # Add additional context
         receipt_data['room_type'] = room_type
-
         if number_of_people and number_of_people.isdigit() and int(number_of_people) > 0:
             receipt_data['number_of_people'] = int(number_of_people)
+        if venmo:
+            receipt_data['venmo'] = venmo
 
         serializer = ReceiptSerializer(data=receipt_data, context={'request': request})
         if serializer.is_valid():
@@ -71,11 +82,17 @@ def upload_receipt_view(request):
         else:
             context['error'] = serializer.errors
             context['room_type'] = room_type
-            return render(request, 'upload_receipt_probabalistic.html' if room_type == 'probabalistic_roulette' else 'upload_receipt.html', context)
+            return render(request, template, context)
 
-    # GET: choose the right template to display
+    # GET
+    if room_type == 'probabalistic_roulette':
+        template = 'upload_receipt_ppr.html'
+    elif room_type == 'custom_split':
+        template = 'upload_custom_split.html'
+    else:
+        template = 'upload_receipt.html'
+
     context['room_type'] = room_type
-    template = 'upload_receipt_ppr.html' if room_type == 'probabalistic_roulette' else 'upload_receipt.html'
     return render(request, template, context)
 
 
