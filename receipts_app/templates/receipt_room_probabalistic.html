@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/receipt_room-styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="receipt-room-container">
+  <div class="receipt-room-card">
+    <h1 class="receipt-room-header">{{ receipt.name }}</h1>
+
+    <div class="receipt-room-details">
+      <p><strong>Total Cost:</strong> ${{ receipt.total_cost }}</p>
+      <p><strong>Taxes:</strong> ${{ receipt.taxes }}</p>
+      <p><strong>Tip:</strong> ${{ receipt.tip }}</p>
+      <p><strong>Uploaded at:</strong> {{ receipt.uploaded_at }}</p>
+      <p><strong>Number of People:</strong> {{ receipt.number_of_people|default:"Not specified" }}</p>
+    </div>
+
+    <h2 class="receipt-room-header">Items</h2>
+    {% if receipt.receipt_items.all %}
+      <ul class="receipt-room-items">
+        {% for item in receipt.receipt_items.all %}
+          <li class="receipt-room-item">
+            <div class="item-container">
+              <p><strong>{{ item.item_name }}</strong>: ${{ item.item_cost }}</p>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="receipt-room-details">No items available.</p>
+    {% endif %}
+
+    <h2 class="receipt-room-header mt-4">Participants</h2>
+    {% with receipt.participants.all as participants %}
+      {% if participants %}
+        <p>{{ participants|length }} of {{ receipt.number_of_people }} participants</p>
+        {% for p in participants %}
+          <div class="participant-box">
+            <p><strong>{{ p.name }}</strong></p>
+            <p>Willingness to Pay: {{ p.willingness_to_pay }}</p>
+            <p>Price Ceiling: ${{ p.price_ceiling }}</p>
+          </div>
+        {% endfor %}
+        {% if receipt.number_of_people and participants|length < receipt.number_of_people %}
+          <a href="{% url 'add_participant' receipt.id %}" class="confirm-btn mt-3">➕ Join this room</a>
+        {% endif %}
+      {% else %}
+        <p>No participants yet. <a href="{% url 'add_participant' receipt.id %}">Join this room</a>.</p>
+      {% endif %}
+    {% endwith %}
+  </div>
+</div>
+{% endblock %}

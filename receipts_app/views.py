@@ -7,6 +7,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from dotenv import load_dotenv
 import logging
+from .models import Receipt, RoomParticipant
+from decimal import Decimal, ROUND_HALF_UP
+import random
 
 from receipts_app.models import Receipt, ReceiptItem
 from receipts_app.serializers import ReceiptSerializer
@@ -24,22 +27,24 @@ def upload_receipt_view(request):
     Accepts room_type from query string or form input.
     """
     context = {}
+    room_type = request.GET.get('room_type', 'custom_split')
 
     if request.method == 'POST':
         receipt_image = request.FILES.get('receipt_image')
         room_type = request.POST.get('room_type', 'custom_split')
+        number_of_people = request.POST.get('number_of_people')
 
         if not receipt_image:
             context['error'] = "No image file provided."
-            context['room_type'] = room_type  # preserve value on error
-            return render(request, 'upload_receipt.html', context)
+            context['room_type'] = room_type
+            return render(request, 'upload_receipt_probabalistic.html' if room_type == 'probabalistic_roulette' else 'upload_receipt.html', context)
 
         try:
             image = Image.open(receipt_image)
         except Exception:
             context['error'] = "Invalid image file."
             context['room_type'] = room_type
-            return render(request, 'upload_receipt.html', context)
+            return render(request, 'upload_receipt_probabalistic.html' if room_type == 'probabalistic_roulette' else 'upload_receipt.html', context)
 
         extracted_text = pytesseract.image_to_string(image)
         print("Extracted Text:", extracted_text)
@@ -50,10 +55,12 @@ def upload_receipt_view(request):
         except Exception as e:
             context['error'] = f"Error processing OCR text: {str(e)}"
             context['room_type'] = room_type
-            return render(request, 'upload_receipt.html', context)
+            return render(request, 'upload_receipt_probabalistic.html' if room_type == 'probabalistic_roulette' else 'upload_receipt.html', context)
 
-        # Inject room_type manually
         receipt_data['room_type'] = room_type
+
+        if number_of_people and number_of_people.isdigit() and int(number_of_people) > 0:
+            receipt_data['number_of_people'] = int(number_of_people)
 
         serializer = ReceiptSerializer(data=receipt_data, context={'request': request})
         if serializer.is_valid():
@@ -62,12 +69,13 @@ def upload_receipt_view(request):
         else:
             context['error'] = serializer.errors
             context['room_type'] = room_type
-            return render(request, 'upload_receipt.html', context)
+            return render(request, 'upload_receipt_probabalistic.html' if room_type == 'probabalistic_roulette' else 'upload_receipt.html', context)
 
-    # GET: populate room_type from query string
-    room_type = request.GET.get('room_type', 'custom_split')
+    # GET: choose the right template to display
     context['room_type'] = room_type
-    return render(request, 'upload_receipt.html', context)
+    template = 'upload_receipt_ppr.html' if room_type == 'probabalistic_roulette' else 'upload_receipt.html'
+    return render(request, template, context)
+
 
 
 def get_json_from_chatgpt(ocr_text):
@@ -146,7 +154,107 @@ def receipt_room_view(request, receipt_id):
         'receipt': receipt
     })
 
+def add_participant(request, receipt_id):
+    receipt = get_object_or_404(Receipt, id=receipt_id)
+
+    # Calculate the default price ceiling
+    try:
+        if receipt.total_cost and receipt.number_of_people:
+            default_ceiling = float(receipt.total_cost) / int(receipt.number_of_people)
+        else:
+            default_ceiling = float(receipt.total_cost or 0)
+    except (ValueError, ZeroDivisionError):
+        default_ceiling = 0.0
+
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        wtp = request.POST.get('willingness_to_pay')
+        ceiling = request.POST.get('price_ceiling')
+
+        if name and wtp and ceiling:
+            try:
+                participant = RoomParticipant(
+                    receipt=receipt,
+                    name=name,
+                    willingness_to_pay=float(wtp),
+                    price_ceiling=float(ceiling),
+                )
+                if request.user.is_authenticated:
+                    participant.user = request.user
+                participant.save()
+                return redirect('receipt_room', receipt_id=receipt.id)
+            except Exception as e:
+                print(f"Error saving participant: {e}")  # Optional: log error
+
+    return render(request, 'add_participant.html', {
+        'receipt': receipt,
+        'default_ceiling': round(default_ceiling, 2),
+    })
+
 @login_required
+def run_probabilistic_split_view(request, receipt_id):
+    receipt = get_object_or_404(Receipt, id=receipt_id)
+    participants = list(receipt.participants.all())
+
+    if len(participants) < (receipt.number_of_people or 0):
+        return redirect('receipt_room', receipt_id=receipt_id)
+
+    total_cost = float(receipt.total_cost or 0)
+    cost_left = total_cost
+    assignments = []
+
+    # Clone the list of participants to iterate through without modifying the original
+    unassigned = participants[:]
+
+    while unassigned:
+        p = unassigned.pop(0)
+
+        # If total cost has already been covered, assign $0 to remaining participants
+        if cost_left <= 0:
+            assignments.append({
+                "name": p.name,
+                "paid": Decimal(0).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP),
+                "ceiling": p.price_ceiling,
+                "initial_prob": p.willingness_to_pay,
+                "random_roll": None
+            })
+            continue
+
+        # Compute remaining weighted average
+        remaining_weight = sum(u.willingness_to_pay * float(u.price_ceiling) for u in unassigned)
+        if remaining_weight > 0 and len(unassigned) > 0:
+            weighted_avg = cost_left / remaining_weight
+        else:
+            weighted_avg = 0
+
+        # Roll for payment
+        rand = random.random()
+        prob = p.willingness_to_pay
+        pay_amount = min(float(p.price_ceiling), cost_left) if rand <= prob else 0
+
+        assignments.append({
+            "name": p.name,
+            "paid": Decimal(pay_amount).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP),
+            "ceiling": p.price_ceiling,
+            "initial_prob": prob,
+            "random_roll": round(rand, 3)
+        })
+
+        cost_left -= pay_amount
+
+        # Adjust willingness for remaining participants
+        if cost_left > 0 and unassigned:
+            for u in unassigned:
+                new_prob = cost_left / (float(u.price_ceiling) * len(unassigned))
+                u.willingness_to_pay = min(round(new_prob, 3), 1.0)
+
+    return render(request, 'probabilistic_result.html', {
+        'receipt': receipt,
+        'assignments': assignments,
+        'total_cost': Decimal(total_cost).quantize(Decimal("0.01"))
+    })
+
+@login_required(login_url='/login/')
 def delete_receipt_view(request, receipt_id):
     receipt = get_object_or_404(Receipt, id=receipt_id)
     if receipt.owner == request.user:
@@ -155,7 +263,7 @@ def delete_receipt_view(request, receipt_id):
     else:
         return redirect('receipt_room', receipt_id=receipt_id)
 
-@login_required
+@login_required(login_url='/login/')
 def delete_receipt_item_view(request, receipt_id, item_id):
     receipt = get_object_or_404(Receipt, id=receipt_id)
     if receipt.owner == request.user:

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/payment-styles.css' %}">
+<style>
+  .participant-box {
+    background: rgba(255, 255, 255, 0.07);
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    color: #f1f1f1;
+    text-align: center;
+  }
+  .participant-box h3 {
+    margin-bottom: 0.3rem;
+    font-size: 1.2rem;
+  }
+  .participant-box p {
+    margin: 0.2rem 0;
+    font-size: 1rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+  <div class="payment-card">
+    <h2 class="text-center">💸 Probabilistic Split Result</h2>
+    <div class="payment-amount-box text-center">
+      <h3>Total Cost: ${{ total_cost }}</h3>
+    </div>
+
+    <h2 class="mt-4 text-center">Payment Breakdown</h2>
+
+    {% for person in assignments %}
+      <div class="participant-box">
+        <h3>{{ person.name }}</h3>
+        {% if person.random_roll is not None %}
+          <p>🎲 Rolled: {{ person.random_roll }}</p>
+          <p>💰 Pays: <strong>${{ person.paid }}</strong></p>
+        {% else %}
+          <p>💰 Paid: <strong>$0.00</strong></p>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <hr class="divider">
+    <a href="{% url 'join-room' %}" class="btn btn-info">🔙 Go to Join Room</a>
+  </div>
+</div>
+{% endblock %}

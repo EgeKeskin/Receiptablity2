@@ -14,7 +14,7 @@ class ReceiptSerializer(serializers.ModelSerializer):
         model = Receipt
         fields = [
             'id', 'owner', 'name', 'total_cost', 'taxes', 'tip',
-            'uploaded_at', 'room_type', 'items'  # ✅ added 'room_type'
+            'uploaded_at', 'room_type', 'number_of_people', 'items'
         ]
 
     def create(self, validated_data):
