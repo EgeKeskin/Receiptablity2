@@ -22,6 +22,7 @@
         {% if receipt.receipt_items.all %}
             <form id="receipt-form" method="POST" action="{% url 'payment' %}">
                 {% csrf_token %}
+                <input type="hidden" name="receipt_id" value="{{ receipt.id }}">
                 <ul class="receipt-room-items">
                     {% for item in receipt.receipt_items.all %}
                         <li class="receipt-room-item">

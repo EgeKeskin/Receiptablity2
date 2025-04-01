@@ -13,8 +13,17 @@ class ReceiptSerializer(serializers.ModelSerializer):
     class Meta:
         model = Receipt
         fields = [
-            'id', 'owner', 'name', 'total_cost', 'taxes', 'tip',
-            'uploaded_at', 'room_type', 'number_of_people', 'items'
+            'id',
+            'owner',
+            'name',
+            'total_cost',
+            'taxes',
+            'tip',
+            'uploaded_at',
+            'room_type',
+            'number_of_people',
+            'venmo',          
+            'items'
         ]
 
     def create(self, validated_data):

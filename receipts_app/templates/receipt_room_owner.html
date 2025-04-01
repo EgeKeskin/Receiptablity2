@@ -145,6 +145,7 @@
 
     <form id="payment-form" method="POST" action="{% url 'payment' %}">
       {% csrf_token %}
+      <input type="hidden" name="receipt_id" value="{{ receipt.id }}"> 
     </form>
     <button type="button" class="confirm-btn" onclick="submitPayment()">Confirm and Pay for Selection</button>
     <form method="POST" action="{% url 'delete_receipt' receipt.id %}">
