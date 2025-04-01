@@ -54,32 +54,58 @@
     <h2 class="receipt-room-header">[Owner View]</h2>
     <h1 class="receipt-room-header">{{ receipt.name }}</h1>
     <div class="receipt-room-details">
-      <p><strong>Total Cost:</strong> {{ receipt.total_cost }}</p>
-      <p><strong>Taxes:</strong> {{ receipt.taxes }}</p>
-      <p><strong>Tip:</strong> {{ receipt.tip }}</p>
+      <p><strong>Total Cost:</strong> ${{ receipt.total_cost }}</p>
+      <p><strong>Taxes:</strong> ${{ receipt.taxes }}</p>
+      <p><strong>Tip:</strong> ${{ receipt.tip }}</p>
       <p><strong>Uploaded at:</strong> {{ receipt.uploaded_at }}</p>
+      <button type="button" class="edit-receipt-btn" onclick="toggleReceiptEdit()">Edit Receipt Details</button>
     </div>
+    
+    <form method="POST" action="{% url 'edit_receipt_details' receipt.id %}" id="receipt-edit-form" class="receipt-edit-form" style="display: none;">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="receipt-name">Restaurant Name:</label>
+          <input type="text" id="receipt-name" name="receipt_name" value="{{ receipt.name }}">
+        </div>
+        <div class="form-group">
+          <label for="taxes">Taxes:</label>
+          <input type="text" id="taxes" name="taxes" value="{{ receipt.taxes }}">
+        </div>
+        <div class="form-group">
+          <label for="tip">Tip:</label>
+          <input type="text" id="tip" name="tip" value="{{ receipt.tip }}">
+        </div>
+        <button type="submit" class="confirm-edit-btn">Save Changes</button>
+      </form>
 
     <h2 class="receipt-room-header">Items</h2>
     <p class="instructions">One person will be randomly selected to pay for all. You can edit/delete items before spinning.</p>
 
     {% if receipt.receipt_items.all %}
-      <ul class="receipt-room-items">
+      <ul class="receipt-room-items" id="receipt-items-list">
         {% for item in receipt.receipt_items.all %}
-          <li class="receipt-room-item">
+          <li class="receipt-room-item" id="item-{{ item.id }}">
             <div class="item-container">
               <div class="item-details">
-                <p><strong>Item Name:</strong> {{ item.item_name }}</p>
-                <p><strong>Item Cost:</strong> {{ item.item_cost }}</p>
+                <p class="item-name" id="item-name-{{ item.id }}">
+                  {{ item.item_name }} - ${{ item.item_cost }}
+                </p>
+                <form method="POST" action="{% url 'edit_receipt_item' receipt.id item.id %}"
+                      class="edit-form" id="edit-form-{{ item.id }}" style="display: none;">
+                  {% csrf_token %}
+                  <input type="hidden" name="current_page" value="roulette_room_owner">
+                  <input type="text" name="item_name" value="{{ item.item_name }}" class="edit-input" placeholder="Item Name">
+                  <input type="text" name="item_cost" value="{{ item.item_cost }}" class="edit-input" placeholder="Item Price">
+                  <button type="submit" class="confirm-edit-btn">✔</button>
+                </form>
               </div>
-              <form method="POST">
-                {% csrf_token %}
-                <button type="submit" class="edit-btn"></button>
-              </form>
-              <form method="POST">
-                {% csrf_token %}
-                <button type="submit" class="delete-btn">X</button>
-              </form>
+              <div class="item-actions">
+                <button type="button" class="edit-btn" onclick="toggleEdit('{{ item.id }}')">✏️</button>
+                <form method="POST" action="{% url 'delete_receipt_item' receipt.id item.id %}" style="display: inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="delete-btn">X</button>
+                </form>
+              </div>
             </div>
           </li>
         {% endfor %}
@@ -91,7 +117,9 @@
           <label class="upload-label" for="names">Enter Names (comma-separated):</label>
           <input type="text" id="namesInput" class="upload-input" placeholder="e.g. Alice, Bob, Charlie" required>
         </div>
-        <button type="submit" class="confirm-btn mt-3">Spin Roulette and Pay</button>
+        <div class="button-wrapper">
+          <button type="submit" class="confirm-btn mt-3">Spin Roulette and Pay</button>
+        </div>
       </form>
 
       <form method="POST" action="{% url 'delete_receipt' receipt.id %}">
@@ -101,6 +129,17 @@
     {% else %}
       <p class="receipt-room-details">No items available.</p>
     {% endif %}
+
+    <button type="button" class="confirm-btn" onclick="addNewItem()">Add New Item</button>
+
+    
+    <form id="payment-form" method="POST" action="{% url 'payment' %}">
+      {% csrf_token %}
+    </form>
+    <form method="POST" action="{% url 'delete_receipt' receipt.id %}">
+      {% csrf_token %}
+      <button type="submit" class="confirm-btn">Delete Room</button>
+    </form>
 
     <hr class="divider">
   </div>
@@ -147,5 +186,89 @@
       if (e.target === modal) modal.style.display = 'none';
     });
   });
+
+
+
+  function toggleEdit(itemId) {
+    const itemName = document.getElementById(`item-name-${itemId}`);
+    const editForm = document.getElementById(`edit-form-${itemId}`);
+    if (itemName.style.display === "none") {
+      itemName.style.display = "block";
+      editForm.style.display = "none";
+    } else {
+      itemName.style.display = "none";
+      editForm.style.display = "inline-flex";
+    }
+  }
+
+  function toggleReceiptEdit() {
+    const receiptEditForm = document.getElementById('receipt-edit-form');
+    if (receiptEditForm.style.display === "none" || receiptEditForm.style.display === "") {
+      receiptEditForm.style.display = "block";
+    } else {
+      receiptEditForm.style.display = "none";
+    }
+  }
+
+  function addNewItem() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const receiptId = "{{ receipt.id }}";
+
+    fetch(`/add_receipt_item/${receiptId}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
+      },
+      body: JSON.stringify({
+        item_name: "New Item",
+        item_cost: 0  
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const newItem = data.item;
+        const itemList = document.getElementById("receipt-items-list");
+
+       
+        
+        const newItemElement = document.createElement("li");
+        newItemElement.className = "receipt-room-item";
+        newItemElement.id = `item-${newItem.id}`;
+        newItemElement.innerHTML = `
+          <div class="item-container">
+            <div class="item-details">
+              <p class="item-name" id="item-name-${newItem.id}" style="display: none;">
+                ${newItem.item_name} - $${newItem.item_cost}
+              </p>
+              <form method="POST" action="/edit_receipt_item/${receiptId}/${newItem.id}/"
+                    class="edit-form" id="edit-form-${newItem.id}" style="display: inline-flex;">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                <input type="text" name="item_name" value="${newItem.item_name}" class="edit-input" placeholder="Item Name">
+                <input type="text" name="item_cost" value="${newItem.item_cost}" class="edit-input" placeholder="Item Price">
+                <button type="submit" class="confirm-edit-btn">✔</button>
+              </form>
+            </div>
+            <div class="item-actions">
+              <input type="checkbox" class="custom-checkbox" name="selected_items" value="${newItem.item_cost}">
+              <button type="button" class="edit-btn" onclick="toggleEdit('${newItem.id}')">✏️</button>
+              <form method="POST" action="/delete_receipt_item/${receiptId}/${newItem.id}/" style="display: inline;">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                <button type="submit" class="delete-btn">X</button>
+              </form>
+            </div>
+          </div>
+        `;
+        itemList.appendChild(newItemElement);
+      } else {
+        alert("Failed to add new item.");
+      }
+    })
+    .catch(error => console.error("Error:", error));
+  }
+
+
+
 </script>
 {% endblock %}

@@ -155,6 +155,10 @@ def receipt_room_owner_view(request, receipt_id):
     """
     receipt = get_object_or_404(Receipt, id=receipt_id)
     if receipt.owner == request.user:
+        if receipt.room_type == 'roulette':
+            return render(request, 'roulette_room_owner.html', {'receipt': receipt})
+        elif receipt.room_type == 'split_evenly':
+            return render(request, 'receipt_room_owner_split.html', {'receipt': receipt})
         return render(request, 'receipt_room_owner.html', {'receipt': receipt})
     else:
         return redirect('receipt_room', receipt_id=receipt_id)
@@ -200,7 +204,9 @@ def edit_receipt_item_view(request, receipt_id, item_id):
             receipt.total_cost = item_total + (receipt.taxes or Decimal(0)) + (receipt.tip or Decimal(0))
             receipt.save()
 
-            return redirect('receipt_room_owner', receipt_id=receipt_id)
+            # Redirect back to the current page
+            current_page = request.POST.get('current_page', 'receipt_room_owner')
+            return redirect(current_page, receipt_id=receipt_id)
         return render(request, 'edit_receipt_item.html', {'item': item})
     else:
         return redirect('receipt_room', receipt_id=receipt_id)
@@ -220,7 +226,10 @@ def edit_receipt_details_view(request, receipt_id):
             receipt.total_cost = item_total + receipt.taxes + receipt.tip
             
             receipt.save()
-            return redirect('receipt_room_owner', receipt_id=receipt_id)
+
+            # Redirect back to the current page
+            current_page = request.POST.get('current_page', 'receipt_room_owner')
+            return redirect(current_page, receipt_id=receipt_id)
     return redirect('receipt_room', receipt_id=receipt_id)
 
 @login_required
