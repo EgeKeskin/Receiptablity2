@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <h2 class="login-header">Profile</h2>
+
+        <form method="POST" id="profile-form">
+            {% csrf_token %}
+            <div class="input-group">
+                <label for="id_username">Username</label>
+                {{ form.username }}
+            </div>
+            <div class="input-group">
+                <label for="id_email">Email</label>
+                {{ form.email }}
+            </div>
+
+            <button type="submit" class="btn" id="update-btn" style="display: none;">Update</button>
+        </form>
+
+        <button class="btn" id="edit-btn" onclick="enableEdit()">Edit Profile</button>
+
+        <div class="register-link">
+            <a href="{% url 'password_change' %}">Change Password</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Make the form read-only by default
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll('#profile-form input').forEach(input => {
+            input.setAttribute('readonly', true);
+        });
+    });
+
+    function enableEdit() {
+        // Enable inputs
+        document.querySelectorAll('#profile-form input').forEach(input => {
+            input.removeAttribute('readonly');
+        });
+        // Show update button
+        document.getElementById('update-btn').style.display = 'block';
+        // Hide edit button
+        document.getElementById('edit-btn').style.display = 'none';
+    }
+</script>
+{% endblock %}

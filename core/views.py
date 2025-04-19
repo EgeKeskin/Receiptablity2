@@ -6,8 +6,31 @@ from django.http import HttpResponse
 from .forms import *
 import random
 from django.views.decorators.csrf import csrf_exempt
-from django.urls import reverse
+from django.contrib import messages
 from receipts_app.models import Receipt
+from django.contrib.auth.decorators import login_required
+
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'input-group'}),
+            'email': forms.EmailInput(attrs={'class': 'input-group'}),
+        }
+
+@login_required
+def profile_view(request):
+    if request.method == 'POST':
+        form = UserUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('profile')
+    else:
+        form = UserUpdateForm(instance=request.user)
+    return render(request, 'profile.html', {'form': form})
 
 def login_view(request):
     if request.method == "POST":

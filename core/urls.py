@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import *
 from .views import instructions  # Import the instructions view
 from .views import eula  # Import the EULA view
@@ -29,4 +29,5 @@ urlpatterns = [
     path('reset/done/', 
          auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), 
          name='password_reset_complete'),
+     path('profile/', profile_view, name='profile'),
 ]
