@@ -1,8 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile-styles.css' %}">
+{% endblock %}
 {% block content %}
-<div class="login-container">
-    <div class="login-card">
-        <h2 class="login-header">Profile</h2>
+<div class="profile-container">
+    <div class="profile-card">
+        <h2 class="profile-header">Profile</h2>
 
         <form method="POST" id="profile-form">
             {% csrf_token %}
