@@ -10,13 +10,16 @@ from receipts_app.models import Receipt
 from receipts_app.serializers import ReceiptSerializer
 from django.contrib.auth.decorators import login_required
 from dotenv import load_dotenv
+import shutil
+import pytesseract
 
 # Ensure the OpenAI API key is set.
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Set the Tesseract executable path
-pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'  # Update this path as needed
+
+pytesseract.pytesseract.tesseract_cmd = shutil.which("tesseract")
+
 
 # Endpoint for image upload that converts a receipt image into JSON using ChatGPT.
 class ReceiptImageUploadView(APIView):

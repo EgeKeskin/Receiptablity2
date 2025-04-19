@@ -13,14 +13,15 @@ from .models import Receipt, RoomParticipant
 from decimal import Decimal, ROUND_HALF_UP
 import random
 from collections import deque
+import shutil
+import pytesseract
 
 from receipts_app.models import Receipt, ReceiptItem
 from receipts_app.serializers import ReceiptSerializer
 
-if os.environ.get('USE_DOCKER') == '1':
-    pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
-else:
-    pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'  # your local path
+
+pytesseract.pytesseract.tesseract_cmd = shutil.which("tesseract")
+
 
 
 # Load environment variables and initialize OpenAI client.

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: receiptablity
+    env: docker
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: receiptablity.onrender.com
