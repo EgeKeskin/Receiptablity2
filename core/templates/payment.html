@@ -3,29 +3,69 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/payment-styles.css' %}">
+<style>
+    .payment-option-box {
+        padding: 1rem;
+        background: #3b3b3b;
+        border-radius: 10px;
+        margin: 10px 0;
+        transition: background 0.3s ease, transform 0.2s ease;
+    }
+    
+    .payment-option-box:hover {
+        background: #505050;
+        transform: scale(1.02);
+    }
+    
+    .payment-option-box h3 {
+        color: #fff;
+        font-size: 1.2rem;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="payment-container">
     <div class="payment-card">
-        <h2>You Owe: </h2>
+        <h2>You Owe:</h2>
         <div class="payment-amount-box text-center">
             <h2>${{ total_cost }}</h2>
         </div>
 
         <h2 class="mt-4">Select Payment Method</h2>
+
+        {% if receipt.venmo %}
+        <a href="https://venmo.com/{{ receipt.venmo }}" target="_blank" onclick="redirectAfterPayment(event)">
+          <div class="payment-option-box text-center" style="cursor: pointer;">
+              <h3 style="color: white; margin: 0;">
+                  💸 Pay {{ receipt.owner.username }} on Venmo (@{{ receipt.venmo }})
+              </h3>
+          </div>
+        </a>
+        {% else %}
         <div class="payment-option-box text-center">
-            <h3>USER's Venmo</h3>
+            <h3>{{ receipt.owner.username }} has not provided a Venmo username.</h3>
         </div>
-        <div class="payment-option-box text-center">
-            <h3>🍎 USER's Apple Pay 🍎</h3>
-        </div>
+        {% endif %}
+        
+
         <a href="{% url 'congratulations' %}" class="cash-payment-btn text-center">
             💵 Pay with Cash 💵
         </a>
-        <hr class="divider">
 
+        <hr class="divider">
         <a href="{% url 'join-room' %}" class="btn btn-info">Go to Join Room</a>
     </div>
 </div>
+
+<script>
+    function redirectAfterPayment(event) {
+        // Wait a moment then redirect (adjust time as needed)
+        setTimeout(() => {
+        window.location.href = "{% url 'congratulations' %}";
+        }, 200); // 200ms delay so link can still open
+    }
+    </script>
 {% endblock %}
+
+

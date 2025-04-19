@@ -1,0 +1,436 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/receipt_room_owner-styles.css' %}">
+<style>
+  
+  .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); }
+  .modal-content { background: white; color: black; margin: 15% auto; padding: 30px 40px; border-radius: 16px; width: 90%; max-width: 400px; text-align: center; position: relative; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); }
+  .modal-content h2 { margin: 0; font-size: 1.5rem; color: #1a1a1a; }
+  .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; font-weight: bold; color: #888; cursor: pointer; }
+  .close-btn:hover { color: #000; }
+
+  .upload-input::placeholder {
+    color: white;
+    opacity: 1; 
+  }
+
+  .edit-receipt-btn {
+    background: rgba(34, 34, 34, 0.7);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    margin-top: 10px;
+  }
+  .edit-receipt-btn:hover {
+    background: rgba(51, 51, 51, 0.85);
+    transform: scale(1.05);
+  }
+
+  .upload-label {
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 5px;
+  }
+
+  .upload-input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    outline: none;
+    transition: background 0.3s;
+  }
+  .upload-input:focus {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .roulette-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    text-align: center;
+  }
+
+  .roulette-container canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .roulette-container .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+  }
+
+  .roulette-container .close-btn:hover {
+    color: #000;
+  }
+
+  .roulette-container #spin-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #541d1d, #356764);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+  }
+
+  .roulette-container #spin-btn:hover {
+    background: linear-gradient(135deg, #356764, #541d1d);
+    transform: scale(1.05);
+  }
+
+  .roulette-container #final-value {
+    margin-top: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="receipt-room-container">
+  <div class="receipt-room-card">
+    <h2 class="receipt-room-header owner-view-header">~Owner View~</h2>
+    <h1 class="receipt-room-header">{{ receipt.name }}</h1>
+    
+    <div class="receipt-room-details">
+      <p><strong>Total Cost:</strong> ${{ receipt.total_cost }}</p>
+      <p><strong>Taxes:</strong> ${{ receipt.taxes }}</p>
+      <p><strong>Tip:</strong> ${{ receipt.tip }}</p>
+      <p><strong>Uploaded at:</strong> {{ receipt.uploaded_at }}</p>
+      <button type="button" class="edit-receipt-btn" onclick="toggleReceiptEdit()">Edit Receipt Details</button>
+    </div>
+    
+    <form method="POST" action="{% url 'edit_receipt_details' receipt.id %}" id="receipt-edit-form" class="receipt-edit-form" style="display: none;">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="receipt-name">Restaurant Name:</label>
+        <input type="text" id="receipt-name" name="receipt_name" value="{{ receipt.name }}">
+      </div>
+      <div class="form-group">
+        <label for="taxes">Taxes:</label>
+        <input type="text" id="taxes" name="taxes" value="{{ receipt.taxes }}">
+      </div>
+      <div class="form-group">
+        <label for="tip">Tip:</label>
+        <input type="text" id="tip" name="tip" value="{{ receipt.tip }}">
+      </div>
+      <button type="submit" class="confirm-edit-btn">Save Changes</button>
+    </form>
+
+    <h2 class="receipt-room-header">Items</h2>
+    <p class="instructions">One person will be randomly selected to pay for all. You can edit/delete items before spinning.</p>
+
+    {% if receipt.receipt_items.all %}
+      <ul class="receipt-room-items" id="receipt-items-list">
+        {% for item in receipt.receipt_items.all %}
+          <li class="receipt-room-item" id="item-{{ item.id }}">
+            <div class="item-container">
+              <div class="item-details">
+                <p class="item-name" id="item-name-{{ item.id }}">
+                  {{ item.item_name }} - ${{ item.item_cost }}
+                </p>
+                <form method="POST" action="{% url 'edit_receipt_item' receipt.id item.id %}"
+                      class="edit-form" id="edit-form-{{ item.id }}" style="display: none;">
+                  {% csrf_token %}
+                  <input type="hidden" name="current_page" value="roulette_room_owner">
+                  <input type="text" name="item_name" value="{{ item.item_name }}" class="edit-input" placeholder="Item Name">
+                  <input type="text" name="item_cost" value="{{ item.item_cost }}" class="edit-input" placeholder="Item Price">
+                  <button type="submit" class="confirm-edit-btn">✔</button>
+                </form>
+              </div>
+              <div class="item-actions">
+                <button type="button" class="edit-btn" onclick="toggleEdit('{{ item.id }}')">✏️</button>
+                <form method="POST" action="{% url 'delete_receipt_item' receipt.id item.id %}" style="display: inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="delete-btn">X</button>
+                </form>
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <button type="button" class="confirm-btn" onclick="addNewItem()">Add New Item</button>
+
+      <form id="roulette-form">
+        <input type="hidden" id="totalCostInput" value="{{ receipt.total_cost }}">
+        <div class="input-group mt-4">
+          <!-- Updated label and input styling: label is white and input uses our .upload-input class -->
+          <label class="upload-label" for="names">Enter Names (comma-separated):</label>
+          <input type="text" id="namesInput" class="upload-input" placeholder="e.g. Alice, Bob, Charlie" required>
+        </div>
+        <div class="button-wrapper">
+          <button type="button" id="spinRouletteBtn" class="confirm-btn mt-3">Spin Roulette and Pay</button>
+        </div>
+      </form>
+
+      <form method="POST" action="{% url 'delete_receipt' receipt.id %}">
+        {% csrf_token %}
+        <button type="submit" class="confirm-btn mt-3">Delete Room</button>
+      </form>
+    {% else %}
+      <p class="receipt-room-details">No items available.</p>
+    {% endif %}
+
+    <form id="payment-form" method="POST" action="{% url 'payment' %}">
+      {% csrf_token %}
+    </form>
+
+    <hr class="divider">
+  </div>
+</div>
+
+<!-- Roulette Wheel Modal -->
+<div class="roulette-container" id="rouletteContainer">
+  <span class="close-btn" id="closeRoulette">&times;</span>
+  <canvas id="wheel"></canvas>
+  <button id="spin-btn">Spin</button>
+  <div id="final-value">Click the Spin button to start!</div>
+</div>
+
+<!-- Modal Popup -->
+<div id="rouletteModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeModal">&times;</span>
+    <h2 id="modalMessage">🎉 Someone pays!</h2>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.1.0/chartjs-plugin-datalabels.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const spinRouletteBtn = document.getElementById('spinRouletteBtn');
+    const rouletteContainer = document.getElementById('rouletteContainer');
+    const closeRoulette = document.getElementById('closeRoulette');
+    const wheel = document.getElementById('wheel');
+    const spinBtn = document.getElementById('spin-btn');
+    const finalValue = document.getElementById('final-value');
+    const totalCost = parseFloat(document.getElementById('totalCostInput').value || "0");
+
+    let myChart;
+    let rotationValues = [];
+    let resultValue = 101;
+
+    // Open roulette modal
+    spinRouletteBtn.addEventListener('click', () => {
+      const namesRaw = document.getElementById('namesInput').value || "";
+      const names = namesRaw.split(',').map(n => n.trim()).filter(n => n);
+
+      if (names.length < 2) {
+        alert("⚠️ Please enter at least two names.");
+        return;
+      }
+
+      // Generate rotation values dynamically based on names
+      const sliceAngle = 360 / names.length;
+      rotationValues = names.map((name, index) => ({
+        minDegree: index * sliceAngle,
+        maxDegree: (index + 1) * sliceAngle,
+        value: name,
+      }));
+
+      // Generate pie chart data
+      const data = Array(names.length).fill(1);
+      const pieColors = names.map((_, index) =>
+        index % 2 === 0 ? "#541d1d" : "#356764" // Use theme colors
+      );
+
+      if (myChart) myChart.destroy();
+      myChart = new Chart(wheel, {
+        plugins: [ChartDataLabels],
+        type: "pie",
+        data: {
+          labels: names,
+          datasets: [
+            {
+              backgroundColor: pieColors,
+              data: data,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          animation: { duration: 0 },
+          plugins: {
+            tooltip: false,
+            legend: { display: false },
+            datalabels: {
+              color: "#ffffff",
+              formatter: (_, context) =>
+                context.chart.data.labels[context.dataIndex],
+              font: { size: 16 },
+            },
+          },
+        },
+      });
+
+      rouletteContainer.style.display = 'block';
+    });
+
+    // Close roulette modal
+    closeRoulette.addEventListener('click', () => {
+      rouletteContainer.style.display = 'none';
+    });
+
+    // Spin the wheel
+    spinBtn.addEventListener('click', () => {
+      spinBtn.disabled = true;
+      finalValue.textContent = "Spinning...";
+      const randomDegree = Math.floor(Math.random() * 360);
+
+      let rotationInterval = setInterval(() => {
+        myChart.options.rotation = (myChart.options.rotation || 0) + resultValue;
+        myChart.update();
+
+        if (myChart.options.rotation >= 360) {
+          myChart.options.rotation = 0;
+        }
+
+        if (resultValue > 1) {
+          resultValue -= 1;
+        } else if (myChart.options.rotation >= randomDegree) {
+          clearInterval(rotationInterval);
+
+          // Determine the selected name based on the arrow position
+          const selectedName = rotationValues.find(
+            (r) =>
+              randomDegree >= r.minDegree && randomDegree <= r.maxDegree
+          ).value;
+
+          // Highlight the selected section
+          const selectedIndex = rotationValues.findIndex(
+            (r) =>
+              randomDegree >= r.minDegree && randomDegree <= r.maxDegree
+          );
+          myChart.data.datasets[0].backgroundColor[selectedIndex] = "#ffeb3b"; // Bright yellow
+          myChart.update();
+
+          // Add glowing effect
+          wheel.style.boxShadow = "0 0 20px 10px rgba(255, 235, 59, 0.8)";
+
+          finalValue.innerHTML = `<p>🎉 ${selectedName} pays $${totalCost.toFixed(
+            2
+          )}!</p>`;
+
+          // Hide the spin button after spinning
+          spinBtn.style.display = 'none';
+
+          resultValue = 101;
+
+          // Remove glow after 3 seconds
+          setTimeout(() => {
+            wheel.style.boxShadow = "none";
+          }, 3000);
+        }
+      }, 10);
+    });
+  });
+
+  function toggleEdit(itemId) {
+    const itemName = document.getElementById(`item-name-${itemId}`);
+    const editForm = document.getElementById(`edit-form-${itemId}`);
+    if (itemName.style.display === "none") {
+      itemName.style.display = "block";
+      editForm.style.display = "none";
+    } else {
+      itemName.style.display = "none";
+      editForm.style.display = "inline-flex";
+    }
+  }
+
+  function toggleReceiptEdit() {
+    const receiptEditForm = document.getElementById('receipt-edit-form');
+    if (receiptEditForm.style.display === "none" || receiptEditForm.style.display === "") {
+      receiptEditForm.style.display = "block";
+    } else {
+      receiptEditForm.style.display = "none";
+    }
+  }
+
+  function addNewItem() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const receiptId = "{{ receipt.id }}";
+
+    fetch(`/add_receipt_item/${receiptId}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
+      },
+      body: JSON.stringify({
+        item_name: "New Item",
+        item_cost: 0  
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const newItem = data.item;
+        const itemList = document.getElementById("receipt-items-list");
+        const newItemElement = document.createElement("li");
+        newItemElement.className = "receipt-room-item";
+        newItemElement.id = `item-${newItem.id}`;
+        newItemElement.innerHTML = `
+          <div class="item-container">
+            <div class="item-details">
+              <p class="item-name" id="item-name-${newItem.id}" style="display: none;">
+                ${newItem.item_name} - $${newItem.item_cost}
+              </p>
+              <form method="POST" action="/edit_receipt_item/${receiptId}/${newItem.id}/"
+                    class="edit-form" id="edit-form-${newItem.id}" style="display: inline-flex;">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                <input type="text" name="item_name" value="${newItem.item_name}" class="edit-input" placeholder="Item Name">
+                <input type="text" name="item_cost" value="${newItem.item_cost}" class="edit-input" placeholder="Item Price">
+                <button type="submit" class="confirm-edit-btn">✔</button>
+              </form>
+            </div>
+            <div class="item-actions">
+              <input type="checkbox" class="custom-checkbox" name="selected_items" value="${newItem.item_cost}">
+              <button type="button" class="edit-btn" onclick="toggleEdit('${newItem.id}')">✏️</button>
+              <form method="POST" action="/delete_receipt_item/${receiptId}/${newItem.id}/" style="display: inline;">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                <button type="submit" class="delete-btn">X</button>
+              </form>
+            </div>
+          </div>
+        `;
+        itemList.appendChild(newItemElement);
+      } else {
+        alert("Failed to add new item.");
+      }
+    })
+    .catch(error => console.error("Error:", error));
+  }
+</script>
+{% endblock %}

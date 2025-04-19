@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY='django-insecure-h%urh1zj9#51%8_hx9!jebv(+3)_!xtv2o5b1n43rxb!001(8&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -115,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Chicago'
 
 USE_I18N = True
 
@@ -128,6 +128,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
 
 AUTHENTICATION_BACKENDS = [
     'core.auth_backends.EmailOrUsernameModelBackend',  # Ensure this is correct

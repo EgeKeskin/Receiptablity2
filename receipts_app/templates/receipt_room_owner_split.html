@@ -45,8 +45,7 @@
     color: #000;
   }
 
-  /* Updated Edit Receipt Details Button
-     Matching the confirm-btn style from earlier files */
+  
   .edit-receipt-btn {
     display: inline-flex;
     align-items: center;
@@ -71,6 +70,33 @@
     transform: scale(1.05);
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
   }
+
+  
+  .upload-label {
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 5px;
+  }
+
+  
+  .upload-input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    outline: none;
+    transition: background 0.3s;
+  }
+  .upload-input:focus {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .upload-input::placeholder {
+    color: white;
+    opacity: 1;
+  }
 </style>
 {% endblock %}
 
@@ -90,6 +116,7 @@
     
     <form method="POST" action="{% url 'edit_receipt_details' receipt.id %}" id="receipt-edit-form" class="receipt-edit-form" style="display: none;">
       {% csrf_token %}
+      <input type="hidden" name="current_page" value="receipt_room_owner_split">
       <div class="form-group">
         <label for="receipt-name">Restaurant Name:</label>
         <input type="text" id="receipt-name" name="receipt_name" value="{{ receipt.name }}">
@@ -104,9 +131,9 @@
       </div>
       <button type="submit" class="confirm-edit-btn">Save Changes</button>
     </form>
-    
+
     <h2 class="receipt-room-header">Items</h2>
-    <p class="instructions">Select the items that belong to you:</p>
+    <p class="instructions">This bill will be split evenly. You can delete items before calculating.</p>
 
     {% if receipt.receipt_items.all %}
       <ul class="receipt-room-items" id="receipt-items-list">
@@ -120,6 +147,7 @@
                 <form method="POST" action="{% url 'edit_receipt_item' receipt.id item.id %}"
                       class="edit-form" id="edit-form-{{ item.id }}" style="display: none;">
                   {% csrf_token %}
+                  <input type="hidden" name="current_page" value="receipt_room_owner_split">
                   <input type="text" name="item_name" value="{{ item.item_name }}" class="edit-input" placeholder="Item Name">
                   <input type="text" name="item_cost" value="{{ item.item_cost }}" class="edit-input" placeholder="Item Price">
                   <button type="submit" class="confirm-edit-btn">✔</button>
@@ -143,21 +171,69 @@
 
     <button type="button" class="confirm-btn" onclick="addNewItem()">Add New Item</button>
 
+      <!-- Split Evenly Form -->
+      <form id="split-evenly-form">
+        <input type="hidden" id="totalCostInput" value="{{ receipt.total_cost }}">
+        <div class="input-group mt-4">
+          <label class="upload-label" for="numPeopleInput">How many people?</label>
+          <input type="number" id="numPeopleInput" class="upload-input" placeholder="e.g. 3" min="1" required>
+        </div>
+        <div class="button-wrapper">
+          <button type="submit" class="confirm-btn mt-3">Split Evenly</button>
+        </div>
+      </form>
+    
+
     <form id="payment-form" method="POST" action="{% url 'payment' %}">
       {% csrf_token %}
-      <input type="hidden" name="receipt_id" value="{{ receipt.id }}"> 
     </form>
-    <button type="button" class="confirm-btn" onclick="submitPayment()">Confirm and Pay for Selection</button>
     <form method="POST" action="{% url 'delete_receipt' receipt.id %}">
       {% csrf_token %}
       <button type="submit" class="confirm-btn">Delete Room</button>
     </form>
-
     <hr class="divider">
   </div>
 </div>
 
+<!-- Modal Popup -->
+<div id="splitModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeModal">&times;</span>
+    <h2 id="modalMessage">💸 Each person pays...</h2>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
 <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('split-evenly-form');
+    const modal = document.getElementById('splitModal');
+    const modalMessage = document.getElementById('modalMessage');
+    const closeModal = document.getElementById('closeModal');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const total = parseFloat(document.getElementById('totalCostInput').value || "0");
+      const numPeople = parseInt(document.getElementById('numPeopleInput').value || "0");
+
+      if (isNaN(total) || isNaN(numPeople) || numPeople <= 0) {
+        alert("⚠️ Please enter a valid number of people and a valid cost.");
+        return;
+      }
+
+      const amount = total / numPeople;
+      modalMessage.textContent = `💸 Each person pays $${amount.toFixed(2)}!`;
+      modal.style.display = 'block';
+    });
+
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  });
+
   function toggleEdit(itemId) {
     const itemName = document.getElementById(`item-name-${itemId}`);
     const editForm = document.getElementById(`edit-form-${itemId}`);
@@ -211,6 +287,7 @@
               <form method="POST" action="/edit_receipt_item/${receiptId}/${newItem.id}/"
                     class="edit-form" id="edit-form-${newItem.id}" style="display: inline-flex;">
                 <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                <input type="hidden" name="current_page" value="receipt_room_owner_split">
                 <input type="text" name="item_name" value="${newItem.item_name}" class="edit-input" placeholder="Item Name">
                 <input type="text" name="item_cost" value="${newItem.item_cost}" class="edit-input" placeholder="Item Price">
                 <button type="submit" class="confirm-edit-btn">✔</button>
@@ -232,26 +309,6 @@
       }
     })
     .catch(error => console.error("Error:", error));
-  }
-
-  function submitPayment() {
-    const form = document.getElementById('payment-form');
-    form.querySelectorAll('input[name="selected_items"]').forEach(el => el.remove());
-    
-    const checkedBoxes = document.querySelectorAll('.custom-checkbox:checked');
-    checkedBoxes.forEach(checkbox => {
-      const hiddenInput = document.createElement('input');
-      hiddenInput.type = 'hidden';
-      hiddenInput.name = 'selected_items';
-      hiddenInput.value = checkbox.value;
-      form.appendChild(hiddenInput);
-    });
-    
-    if (checkedBoxes.length > 0) {
-      form.submit();
-    } else {
-      alert("Please select at least one item before proceeding to payment.");
-    }
   }
 </script>
 {% endblock %}

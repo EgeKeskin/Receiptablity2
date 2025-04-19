@@ -8,13 +8,20 @@ ENV PYTHONUNBUFFERED 1
 # Set working directory
 WORKDIR /receiptablity
 
+# Install Tesseract and dependencies
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    libtesseract-dev \
+    libleptonica-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy project files
 COPY . /receiptablity/
 
 # Create the static directory
 RUN mkdir -p /static
 
-# Install dependencies
+# Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install -r requirements.txt
 

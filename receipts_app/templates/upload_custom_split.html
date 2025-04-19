@@ -2,7 +2,6 @@
 {% load static %}
 {% load receipt_filters %}
 
-
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/upload_receipt-styles.css' %}">
 {% endblock %}
@@ -26,6 +25,9 @@
             <label for="receipt_image" class="upload-label">Select Receipt Image:</label>
             <input type="file" name="receipt_image" id="receipt_image" accept="image/*" class="upload-input" required>
 
+            <label for="venmo" class="upload-label">Venmo Username (Optional, no @):</label>
+            <input type="text" name="venmo" id="venmo" placeholder="@yourhandle" class="upload-input">
+
             <!-- Pass room_type as a hidden field -->
             <input type="hidden" name="room_type" value="{{ room_type }}">
 
@@ -34,4 +36,3 @@
     </div>
 </div>
 {% endblock %}
-

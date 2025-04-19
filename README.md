@@ -6,8 +6,8 @@ Name your repository using the following format:
 
 ## Team Members
 - **&lt;Member Name&gt;**: &lt;e.keskin@wustl.edu&gt; ; &lt;EgeKeskin&gt;
-- **&lt;Member Name&gt;**: &lt;h.sawyer@wustl.edu&gt; ; &lt;shelzberg1&gt;
 - **&lt;Member Name&gt;**: &lt;n.stuart@wustl.edu&gt; ; &lt;nicoStuart&gt;
+- **&lt;Member Name&gt;**: &lt;h.sawyer@wustl.edu&gt; ; &lt;shelzberg1&gt;
 
 ## TA
 &lt;Mutaz&gt;

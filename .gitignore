@@ -39,3 +39,4 @@ yarn-error.log
 
 # Ignore MacOS system files
 .DS_Store
+myenv/

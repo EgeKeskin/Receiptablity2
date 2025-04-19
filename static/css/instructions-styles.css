@@ -60,11 +60,13 @@ body, html {
     border: 1px solid rgba(255, 255, 255, 0.3);
     text-align: left;
     transition: all 0.3s ease-in-out;
+    max-height: calc(100vh - 120px);  /* Ensures the card doesn't exceed the screen height */
+    overflow-y: auto;               /* Adds vertical scrolling when needed */
+    color: #ffffff;                /* Sets all text to white */
 }
 
 /* Headings & Text */
 .join-card h2 {
-    color: #ffffff;
     font-size: 2rem;
     margin-bottom: 10px;
     text-align: center;
@@ -72,7 +74,6 @@ body, html {
 
 .join-card p,
 .join-card li p {
-    color: rgba(255, 255, 255, 0.9);
     font-size: 1rem;
     line-height: 1.5;
 }
@@ -87,7 +88,6 @@ body, html {
 }
 
 .join-card ol li h3 {
-    color: #ffffff;
     margin-top: 10px;
     margin-bottom: 5px;
     font-weight: 600;

@@ -1,5 +1,7 @@
-from django.urls import path
+from django.urls import path, include
 from .views import *
+from .views import instructions  # Import the instructions view
+from .views import eula  # Import the EULA view
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -12,6 +14,9 @@ urlpatterns = [
     path('create-room/', create_room, name='create-room'),
     path('in-room/', in_room, name='in-room'),
     path('payment/', payment, name='payment'),
+    path('congratulations/', congratulations, name='congratulations'),
+    path('instructions/', instructions, name='instructions'),  # Add this line
+    path('eula/', eula, name='eula'),  # Add this line
     path('password_reset/', 
          auth_views.PasswordResetView.as_view(template_name='password_reset_form.html'), 
          name='password_reset'),
@@ -24,5 +29,5 @@ urlpatterns = [
     path('reset/done/', 
          auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), 
          name='password_reset_complete'),
-    path('congratulations/', congratulations, name='congratulations'),
+     path('profile/', profile_view, name='profile'),
 ]

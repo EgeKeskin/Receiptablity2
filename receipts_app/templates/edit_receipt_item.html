@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="edit-item-container">
+    <h1>Edit Receipt Item</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="item_name">Item Name:</label>
+        <input type="text" id="item_name" name="item_name" value="{{ item.item_name }}" required>
+        <button type="submit">Save</button>
+    </form>
+</div>
+{% endblock %}

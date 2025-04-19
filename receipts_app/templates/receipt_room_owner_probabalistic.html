@@ -9,9 +9,9 @@
     display: none;
     position: fixed;
     z-index: 999;
-    left: 0;
+    left: 0; 
     top: 0;
-    width: 100%;
+    width: 100%; 
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
   }
@@ -45,31 +45,64 @@
     color: #000;
   }
 
-  /* Updated Edit Receipt Details Button
-     Matching the confirm-btn style from earlier files */
+  /* Modern Edit Receipt Details Button with less rounded corners */
   .edit-receipt-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px 28px;
-    font-size: 1.2rem;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 600;
-    letter-spacing: 1px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    background: rgba(34, 34, 34, 0.7);
+    background: rgba(34, 34, 34, 0.8);
     color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;  /* Changed from 20px to 12px */
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2rem;
     cursor: pointer;
-    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
-    backdrop-filter: blur(8px);
+    transition: background 0.3s, transform 0.2s;
     margin-top: 10px;
-    min-width: 250px;
   }
   .edit-receipt-btn:hover {
-    background: rgba(51, 51, 51, 0.85);
+    background: rgba(51, 51, 51, 0.9);
     transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+  }
+
+  /* Participants message styling: white and bold */
+  .participants-message {
+    color: white;
+    font-weight: bold;
+  }
+  .participants-message a {
+    color: white;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+
+  /* Participant box text styling */
+  .participant-box,
+  .participant-box p {
+    color: white;
+  }
+
+  /* Styling for the label and input for entering names */
+  .upload-label {
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 5px;
+  }
+  .upload-input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    outline: none;
+    transition: background 0.3s;
+  }
+  .upload-input:focus {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .upload-input::placeholder {
+    color: white;
+    opacity: 1;
   }
 </style>
 {% endblock %}
@@ -79,17 +112,19 @@
   <div class="receipt-room-card">
     <h2 class="receipt-room-header">~Owner View~</h2>
     <h1 class="receipt-room-header">{{ receipt.name }}</h1>
-    
+
     <div class="receipt-room-details">
       <p><strong>Total Cost:</strong> ${{ receipt.total_cost }}</p>
       <p><strong>Taxes:</strong> ${{ receipt.taxes }}</p>
       <p><strong>Tip:</strong> ${{ receipt.tip }}</p>
       <p><strong>Uploaded at:</strong> {{ receipt.uploaded_at }}</p>
+      <p><strong>Number of People:</strong> {{ receipt.number_of_people|default:"Not specified" }}</p>
       <button type="button" class="edit-receipt-btn" onclick="toggleReceiptEdit()">Edit Receipt Details</button>
     </div>
-    
+
     <form method="POST" action="{% url 'edit_receipt_details' receipt.id %}" id="receipt-edit-form" class="receipt-edit-form" style="display: none;">
       {% csrf_token %}
+      <input type="hidden" name="current_page" value="receipt_room_owner_probabalistic">
       <div class="form-group">
         <label for="receipt-name">Restaurant Name:</label>
         <input type="text" id="receipt-name" name="receipt_name" value="{{ receipt.name }}">
@@ -104,10 +139,8 @@
       </div>
       <button type="submit" class="confirm-edit-btn">Save Changes</button>
     </form>
-    
-    <h2 class="receipt-room-header">Items</h2>
-    <p class="instructions">Select the items that belong to you:</p>
 
+    <h2 class="receipt-room-header">Items</h2>
     {% if receipt.receipt_items.all %}
       <ul class="receipt-room-items" id="receipt-items-list">
         {% for item in receipt.receipt_items.all %}
@@ -120,13 +153,13 @@
                 <form method="POST" action="{% url 'edit_receipt_item' receipt.id item.id %}"
                       class="edit-form" id="edit-form-{{ item.id }}" style="display: none;">
                   {% csrf_token %}
+                  <input type="hidden" name="current_page" value="receipt_room_owner_probabalistic">
                   <input type="text" name="item_name" value="{{ item.item_name }}" class="edit-input" placeholder="Item Name">
                   <input type="text" name="item_cost" value="{{ item.item_cost }}" class="edit-input" placeholder="Item Price">
                   <button type="submit" class="confirm-edit-btn">✔</button>
                 </form>
               </div>
               <div class="item-actions">
-                <input type="checkbox" class="custom-checkbox" name="selected_items" value="{{ item.item_cost }}">
                 <button type="button" class="edit-btn" onclick="toggleEdit('{{ item.id }}')">✏️</button>
                 <form method="POST" action="{% url 'delete_receipt_item' receipt.id item.id %}" style="display: inline;">
                   {% csrf_token %}
@@ -143,21 +176,77 @@
 
     <button type="button" class="confirm-btn" onclick="addNewItem()">Add New Item</button>
 
-    <form id="payment-form" method="POST" action="{% url 'payment' %}">
-      {% csrf_token %}
-      <input type="hidden" name="receipt_id" value="{{ receipt.id }}"> 
-    </form>
-    <button type="button" class="confirm-btn" onclick="submitPayment()">Confirm and Pay for Selection</button>
-    <form method="POST" action="{% url 'delete_receipt' receipt.id %}">
+    <h2 class="receipt-room-header mt-4">Participants</h2>
+    {% with receipt.participants.all as participants %}
+      {% if participants %}
+        <p class="participants-message">{{ participants|length }} of {{ receipt.number_of_people }} participants</p>
+        {% for p in participants %}
+          <div class="participant-box">
+            <p><strong>{{ p.name }}</strong></p>
+            <p>Willingness to Pay: {{ p.willingness_to_pay }}</p>
+            <p>Price Ceiling: ${{ p.price_ceiling }}</p>
+            <p>Effective Weight: {{ p.willingness_to_pay|floatformat:2 }} × {{ p.price_ceiling|floatformat:2 }} = {{ p.willingness_to_pay|floatformat:2|floatformat:"g" }} * {{ p.price_ceiling|floatformat:2|floatformat:"g" }}</p>
+          </div>
+        {% endfor %}
+        {% if receipt.number_of_people and participants|length < receipt.number_of_people %}
+          <a href="{% url 'add_participant' receipt.id %}" class="confirm-btn mt-2">➕ Add Another Participant</a>
+        {% endif %}
+      {% else %}
+        <p class="participants-message">No participants yet. <a href="{% url 'add_participant' receipt.id %}">Add one</a>.</p>
+      {% endif %}
+    {% endwith %}
+
+    {% with receipt.participants.all as participants %}
+      {% if receipt.number_of_people and participants|length >= receipt.number_of_people %}
+        <form method="POST" action="{% url 'run_probabilistic_split' receipt.id %}">
+          {% csrf_token %}
+          <button type="submit" class="confirm-btn mt-3">🎲 Run Probabilistic Split</button>
+        </form>
+      {% else %}
+        <button class="confirm-btn mt-3" disabled title="Waiting for all participants to join...">
+          ⏳ Waiting for {{ receipt.number_of_people|default:"?" }} participants...
+        </button>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{% url 'delete_receipt' receipt.id %}" class="mt-4">
       {% csrf_token %}
       <button type="submit" class="confirm-btn">Delete Room</button>
     </form>
-
-    <hr class="divider">
   </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('split-evenly-form');
+    const modal = document.getElementById('splitModal');
+    const modalMessage = document.getElementById('modalMessage');
+    const closeModal = document.getElementById('closeModal');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const total = parseFloat(document.getElementById('totalCostInput').value || "0");
+      const numPeople = parseInt(document.getElementById('numPeopleInput').value || "0");
+
+      if (isNaN(total) || isNaN(numPeople) || numPeople <= 0) {
+        alert("⚠️ Please enter a valid number of people and a valid cost.");
+        return;
+      }
+
+      const amount = total / numPeople;
+      modalMessage.textContent = `💸 Each person pays $${amount.toFixed(2)}!`;
+      modal.style.display = 'block';
+    });
+
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  });
+
   function toggleEdit(itemId) {
     const itemName = document.getElementById(`item-name-${itemId}`);
     const editForm = document.getElementById(`edit-form-${itemId}`);
@@ -211,6 +300,7 @@
               <form method="POST" action="/edit_receipt_item/${receiptId}/${newItem.id}/"
                     class="edit-form" id="edit-form-${newItem.id}" style="display: inline-flex;">
                 <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                <input type="hidden" name="current_page" value="receipt_room_owner_probabalistic">
                 <input type="text" name="item_name" value="${newItem.item_name}" class="edit-input" placeholder="Item Name">
                 <input type="text" name="item_cost" value="${newItem.item_cost}" class="edit-input" placeholder="Item Price">
                 <button type="submit" class="confirm-edit-btn">✔</button>
@@ -232,26 +322,6 @@
       }
     })
     .catch(error => console.error("Error:", error));
-  }
-
-  function submitPayment() {
-    const form = document.getElementById('payment-form');
-    form.querySelectorAll('input[name="selected_items"]').forEach(el => el.remove());
-    
-    const checkedBoxes = document.querySelectorAll('.custom-checkbox:checked');
-    checkedBoxes.forEach(checkbox => {
-      const hiddenInput = document.createElement('input');
-      hiddenInput.type = 'hidden';
-      hiddenInput.name = 'selected_items';
-      hiddenInput.value = checkbox.value;
-      form.appendChild(hiddenInput);
-    });
-    
-    if (checkedBoxes.length > 0) {
-      form.submit();
-    } else {
-      alert("Please select at least one item before proceeding to payment.");
-    }
   }
 </script>
 {% endblock %}

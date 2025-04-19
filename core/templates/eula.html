@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    height: 100vh;
+    width: 100%;
+    background: black;
+    color: yellow;
+    overflow: hidden;
+  }
+
+  #titles {
+    position: absolute;
+    width: 18em;
+    height: 50em;
+    bottom: 0;
+    left: 50%;
+    margin-left: -9em;
+    font-size: 150%;
+    font-weight: bold;
+    text-align: justify;
+    overflow: hidden;
+    transform-origin: 50% 100%;
+    transform: perspective(300px) rotateX(25deg);
+  }
+
+  #titles:after {
+    position: absolute;
+    content: ' ';
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 60%;
+    background-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, transparent 80%);
+    pointer-events: none;
+  }
+
+  #titlecontent {
+    position: absolute;
+    top: 100%;
+    animation: scroll 125s linear infinite;
+  }
+
+  @keyframes scroll {
+    0% { top: 100%; }
+    100% { top: -170%; }
+  }
+</style>
+{% endblock %}
+
+{% block title %}Instructions{% endblock %}
+
+{% block content %}
+<div id="titles">
+  <div id="titlecontent">
+    <h1>End User License Agreement (EULA)</h1>
+    <h3><i>~Star Wars Assemblage Scraped Together by Coder Stew (DJ Namiko)~</i></h3>
+    <p><strong>1. Introduction</strong></p>
+    <p>This End User License Agreement ("Agreement") is a legal agreement between you ("User") and [Receiptability Corporation] (“Receiptability”) regarding the use of the [Receiptability] ("App"), a receipt scanning and gambling application. By downloading, installing, or using the App, you agree to be bound by the terms of this Agreement.</p>
+    <p><strong>2. License Grant</strong></p>
+    <p>Company grants User a limited, non-exclusive, non-transferable, revocable license to use the App for personal, non-commercial purposes in accordance with this Agreement.</p>
+    <p><strong>3. User Obligations</strong></p>
+    <ul>
+      <li>User must be at least 18 years old (or the legal gambling age in their jurisdiction).</li>
+      <li>User agrees to comply with all applicable laws and regulations regarding gambling.</li>
+      <li>User must not attempt to reverse-engineer, decompile, or tamper with the App.</li>
+      <li>User is responsible for ensuring that all receipts scanned are valid and comply with the App’s terms.</li>
+    </ul>
+    <p><strong>4. Gambling and Rewards</strong></p>
+    <ul>
+      <li>The App allows Users to participate in gambling activities based on receipt scanning.</li>
+      <li>The Company does not guarantee winnings and is not responsible for any financial loss incurred by the User.</li>
+      <li>Rewards and winnings, if applicable, will be subject to Company’s verification and eligibility requirements.</li>
+    </ul>
+    <p><strong>5. Data Collection and Privacy</strong></p>
+    <p>User acknowledges and agrees that the App may collect and process personal and transactional data in accordance with the Company’s Privacy Policy.</p>
+    <p><strong>6. Termination</strong></p>
+    <p>Company may terminate or suspend access to the App at any time without prior notice if the User violates any terms of this Agreement.</p>
+    <p><strong>7. Disclaimer of Warranties</strong></p>
+    <p>The App is provided "as is" without any warranties of any kind. The Company disclaims all warranties, express or implied, including but not limited to merchantability, fitness for a particular purpose, and non-infringement.</p>
+    <p><strong>8. Limitation of Liability</strong></p>
+    <p>To the fullest extent permitted by law, the Company shall not be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use the App.</p>
+    <p><strong>9. Governing Law</strong></p>
+    <p>This Agreement shall be governed by and construed in accordance with the laws of [Jurisdiction].</p>
+    <p><strong>10. Changes to the Agreement</strong></p>
+    <p>Company reserves the right to modify this Agreement at any time. Continued use of the App after modifications constitute acceptance of the revised terms.</p>
+    <p><strong>11. Contact Information</strong></p>
+    <p>For any questions regarding this Agreement, please contact [sawthelaw@yahoo.com].</p>
+  </div>
+</div>
+
+
+<audio id="background-music" loop>
+  <source src="{% static 'audio/star_wars.mp3' %}" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const music = document.getElementById('background-music');
+    const titleContent = document.getElementById('titlecontent');
+
+    music.play().catch((error) => {
+      console.warn("Audio playback was prevented. User interaction may be required.", error);
+    });
+    
+
+    titleContent.addEventListener('animationiteration', () => {
+      music.currentTime = 0;
+      music.play();
+    });
+  });
+</script>
+{% endblock %}
