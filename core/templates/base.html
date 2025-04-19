@@ -61,6 +61,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'eula' %}" title="EULA">EULA</a>
+
+                    <li class="nav-item">
+                        <button id="toggle-video-btn" class="btn btn-outline-light ms-2">Focus Mode</button>
                     </li>
                 </ul>
             </div>
@@ -77,3 +80,38 @@
     {% block scripts %}{% endblock %}
 </body>
 </html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleBtn = document.getElementById('toggle-video-btn');
+        const video = document.getElementById('bg-video');
+        const contentBox = document.getElementById('room-card'); // Content box or any element you want to make transparent
+
+        // Apply stored preference on load
+        const videoVisible = localStorage.getItem('videoVisible');
+
+        if (video && videoVisible === 'false') {
+            video.style.zIndex = '-1';
+            if (contentBox) contentBox.classList.remove('transparent-box');
+        } else if (video) {
+            video.style.zIndex = '0';
+            if (contentBox) contentBox.classList.add('transparent-box');
+        }
+
+        if (toggleBtn && video && contentBox) {
+            toggleBtn.addEventListener('click', () => {
+                // Toggle z-index for video and opacity for content box
+                const isHidden = video.style.zIndex === '-1';
+                video.style.zIndex = isHidden ? '0' : '-1';
+                contentBox.classList.toggle('transparent-box', !isHidden); // Toggle opacity class
+
+                // Store the state in localStorage
+                localStorage.setItem('videoVisible', isHidden ? 'true' : 'false');
+
+                // Reload the page to apply full effect
+                location.reload();
+            });
+        }
+    });
+</script>
+

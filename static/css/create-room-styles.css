@@ -32,13 +32,31 @@ body, html {
     z-index: 100;
 }
 
+video {
+    position: fixed;  /* Ensure the video is fixed to the background */
+    top: 0;           /* Start at the top of the page */
+    left: 0;          /* Start at the left side */
+    width: 100vw;     /* Full width of the viewport */
+    height: 100vh;    /* Full height of the viewport */
+    object-fit: cover; /* Ensure it covers the entire viewport, preserving aspect ratio */
+    z-index: 0;      /* Place the video behind all content */
+    opacity: 0.7;     /* Optional: Adjust opacity for better visibility of content */
+}
+
 .create-room-container {
+    position: relative; /* Make sure content is positioned relative to the screen */
+    z-index: 1; /* Content will be in front of the video */
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: calc(100vh - 80px);
-    margin-top: 80px;
+    height: 100vh; /* Full height of the viewport */
+    /* opacity: 0.5 */
+}
+
+.transparent-box {
+    opacity: 0.6; /* Adjust this value for the desired transparency */
+    transition: opacity 0.3s ease; /* Smooth transition */
 }
 
 .create-room-card {
@@ -51,56 +69,15 @@ body, html {
     border: 1px solid rgba(255, 255, 255, 0.2);
     text-align: center;
     transition: all 0.3s ease-in-out;
+    z-index: 2; /* Content above the video */
 }
+
+
 
 h2 {
     color: white;
     font-size: 2rem;
     margin-bottom: 20px;
-}
-
-.custom-btn {
-    display: block;
-    text-align: center;
-    width: 100%;
-    padding: 15px;
-    font-size: 1.4rem;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-bottom: 15px;
-    transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
-    backdrop-filter: blur(8px);
-    color: white;
-    text-decoration: none;
-}
-
-.btn-dark-red {
-    background: #6b2222;
-}
-
-.btn-deep-green {
-    background: #2a524b;
-}
-
-.btn-muted-blue {
-    background: #4a646c;
-}
-
-.btn-light-teal {
-    background: #5b8b91;
-}
-
-.custom-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
-    filter: brightness(1.2);
-}
-
-.btn-lucky {
-    background: linear-gradient(135deg, #541d1d, #356764);
-    background-size: 200% 200%;
-    animation: gradient-shift 6s infinite linear alternate;
 }
 
 .divider {
@@ -111,9 +88,6 @@ h2 {
     margin: 20px auto;
     box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
-
-
-
 
 /* Fun stuff https://www.w3schools.com/django/django_add_js_file.php */
 
@@ -128,19 +102,57 @@ h2 {
     cursor: pointer;
     margin-bottom: 15px;
     transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
-    backdrop-filter: blur(8px);
     color: white;
     text-decoration: none;
 }
 
-.btn-lucky {
-    background: linear-gradient(135deg, #541d1d, #356764);
-    background-size: 200% 200%;
-    animation: gradient-shift 6s infinite linear alternate;
-    transition: all 1s ease-in-out;
-    position: relative;
-    z-index: 10;
+.btn-navy {
+    background-color: #293E52;
+    color: white;
 }
+.btn-navy:hover {
+    filter: brightness(1.1);
+    transform: scale(1.05);
+}
+
+.btn-steel {
+    background-color: #596E84;
+    color: white;
+}
+.btn-steel:hover {
+    filter: brightness(1.05);
+    transform: scale(1.03);
+}
+
+.btn-slate {
+    background-color: #4C637C
+}
+.btn-slate:hover {
+    filter: brightness(1.1);
+    transform: scale(1.05);
+}
+
+.btn-midnight {
+    background-color: #2C4756
+}
+.btn-midnight:hover {
+    filter: brightness(1.1);
+    transform: scale(1.05);
+}
+
+.btn-cool {
+    background-color: #7A8E9D
+}
+.btn-cool:hover {
+    filter: brightness(1.1);
+    transform: scale(1.05);
+}
+
+.btn-lucky {
+    background: linear-gradient(135deg, #ff00cc, #3333ff);
+    animation: lucky-colors 3s infinite alternate ease-in-out;
+}
+
 
 .expand-fullscreen {
     position: fixed;
