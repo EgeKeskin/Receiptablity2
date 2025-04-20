@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: receiptablity
+    env: docker
+    plan: free
+    autoDeploy: true
+    startCommand: sh -c "python manage.py collectstatic --noinput && gunicorn receiptablity.wsgi:application --bind 0.0.0.0:$PORT --workers 2"
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: receiptablity2.onrender.com
