@@ -4,12 +4,19 @@ services:
     env: docker
     plan: free
     autoDeploy: true
-    startCommand: >-
+    # run migrations → collect static → start gunicorn on $PORT
+    startCommand: |
       sh -c "python manage.py migrate --noinput &&
              python manage.py collectstatic --noinput &&
-             gunicorn receiptablity.wsgi:application --bind 0.0.0.0:\$PORT --workers 2"
+             gunicorn receiptablity.wsgi:application --bind 0.0.0.0:$PORT --workers 2"
     envVars:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
         value: receiptablity2.onrender.com
+      - key: SECRET_KEY
+        value: "<your-production-secret-key>"
+      - key: DATABASE_URL
+        # ← this line will inject your Render Postgres URL automatically
+        fromDatabase:
+          name: receiptablity-db   # <— replace with the name of your DB service in Render
