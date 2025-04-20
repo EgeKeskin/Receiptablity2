@@ -129,3 +129,16 @@ EMAIL_USE_TLS = True
 
 # OpenAI
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# Tell Django you’re behind a proxy that sets X‑Forwarded‑Proto
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
+# Only if you want cookies marked “secure”
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# Trust your Render hostname for CSRF checks
+CSRF_TRUSTED_ORIGINS = [
+    "https://receiptablity2.onrender.com",
+]
