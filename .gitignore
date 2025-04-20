@@ -34,9 +34,6 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# Ignore migrations (optional, only if regenerating migrations is preferred)
-**/migrations/**
-
 # Ignore MacOS system files
 .DS_Store
 myenv/
