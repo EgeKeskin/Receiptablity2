@@ -65,12 +65,50 @@
                     <li class="nav-item">
                         <button id="toggle-video-btn" class="btn btn-outline-light ms-2">Focus Mode</button>
                     </li>
+                    <li class="nav-item">
+                        <button id="toggle-game-btn" class="btn btn-outline-light ms-2">Focus Mode++</button>
+                    </li>
+                    <li class="nav-item">
+                        <button id="toggle-marble-btn" class="btn btn-outline-light ms-2">Throwback</button>
+                    </li>
+                    <li class="nav-item">
+                        <button id="toggle-bird-btn" class="btn btn-outline-light ms-2">Bird</button>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link ms-3" href="{% url 'profile' %}" title="Profile">
+                            <img src="{% static 'images/profile-icon.png' %}" alt="Profile Icon" style="height: 30px; border-radius: 50%;">
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    
+    <div id="credit-text" style="display: none; position: fixed; bottom: 320px; right: 10px; color: white; font-family: 'Roboto', sans-serif; font-size: 0.9rem; text-align: center; z-index: 10000;">
+        Credit goes to software engineer yell0wsuit for creating the source code
+    </div>
+    <div id="game-overlay" style="display: none; position: fixed; bottom: 10px; right: 10px; width: 400px; height: 300px; background: rgba(0, 0, 0, 0.8); border: 2px solid white; border-radius: 10px; z-index: 9999; overflow: hidden;">
+        <button id="close-game-btn" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer; z-index: 10000;">X</button>
+        <iframe src="{% static 'games/subway-surfers/index.html' %}" title="Subway Surfers Game" style="width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+
+    <div id="marble-overlay" style="display: none; position: fixed; bottom: 10px; left: 10px; width: 400px; height: 300px; background: rgba(0, 0, 0, 0.8); border: 2px solid white; border-radius: 10px; z-index: 9999; overflow: hidden;">
+        <button id="close-marble-btn" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer; z-index: 10000;">X</button>
+        <iframe src="{% static 'games/MarbleBlast/src/index.html' %}" title="Marble Blast Game" style="width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+
+    <div id="bird-overlay" style="display: none; position: fixed; top: 60px; left: 10px; width: 431px; height: 768px; background: rgba(0, 0, 0, 0.8); border: 2px solid white; border-radius: 10px; z-index: 9999; overflow: hidden;">
+        <button id="close-bird-btn" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer; z-index: 10000;">X</button>
+        <header>
+            <h1 style="color: white; text-align: center;">Flappy Bird</h1>
+            <div class="score-container" style="display: flex; justify-content: space-between; padding: 8px 6px; background: #5EE270;">
+                <div id="bestScore" style="color: white;"></div>
+                <div id="currentScore" style="color: white;"></div>
+            </div>
+        </header>
+        <canvas id="canvas" width="431" height="768" style="display: block; margin: 0 auto;"></canvas>
+    </div>
+
     <div class="container mt-4">
         {% block content %}
         {% endblock %}
@@ -85,9 +123,9 @@
     document.addEventListener('DOMContentLoaded', function () {
         const toggleBtn = document.getElementById('toggle-video-btn');
         const video = document.getElementById('bg-video');
-        const contentBox = document.getElementById('room-card'); // Content box or any element you want to make transparent
+        const contentBox = document.getElementById('room-card'); 
 
-        // Apply stored preference on load
+        
         const videoVisible = localStorage.getItem('videoVisible');
 
         if (video && videoVisible === 'false') {
@@ -100,18 +138,163 @@
 
         if (toggleBtn && video && contentBox) {
             toggleBtn.addEventListener('click', () => {
-                // Toggle z-index for video and opacity for content box
+                
                 const isHidden = video.style.zIndex === '-1';
                 video.style.zIndex = isHidden ? '0' : '-1';
-                contentBox.classList.toggle('transparent-box', !isHidden); // Toggle opacity class
+                contentBox.classList.toggle('transparent-box', !isHidden); 
 
-                // Store the state in localStorage
+                
                 localStorage.setItem('videoVisible', isHidden ? 'true' : 'false');
 
-                // Reload the page to apply full effect
+                
                 location.reload();
             });
         }
+
+        const gameOverlay = document.getElementById("game-overlay");
+        const toggleGameBtn = document.getElementById("toggle-game-btn");
+        const closeGameBtn = document.getElementById("close-game-btn");
+        const gameIframe = gameOverlay.querySelector("iframe");
+        const creditText = document.getElementById("credit-text");
+        const gameSrc = "{% static 'games/subway-surfers/index.html' %}"; 
+
+        // Check localStorage for overlay state
+        const overlayState = localStorage.getItem("gameOverlayVisible");
+
+        if (overlayState === "true") {
+            gameOverlay.style.display = "block";
+            creditText.style.display = "block";
+            gameIframe.src = gameSrc; // Restore the game iframe
+        }
+
+        if (toggleGameBtn) {
+            toggleGameBtn.addEventListener("click", () => {
+                gameOverlay.style.display = "block";
+                creditText.style.display = "block"; // Show the credit text
+                gameIframe.src = gameSrc; // Set the iframe's src to start the game
+                localStorage.setItem("gameOverlayVisible", "true"); // Save state in localStorage
+            });
+        }
+
+        if (closeGameBtn) {
+            closeGameBtn.addEventListener("click", () => {
+                gameOverlay.style.display = "none";
+                creditText.style.display = "none"; // Hide the credit text
+                gameIframe.src = ""; // Clear the iframe's src to stop the game
+                localStorage.setItem("gameOverlayVisible", "false"); // Save state in localStorage
+            });
+        }
+
+        const marbleOverlay = document.getElementById("marble-overlay");
+        const toggleMarbleBtn = document.getElementById("toggle-marble-btn");
+        const closeMarbleBtn = document.getElementById("close-marble-btn");
+        const marbleIframe = marbleOverlay.querySelector("iframe");
+        const marbleSrc = "{% static 'games/MarbleBlast/src/index.html' %}";
+
+        if (toggleMarbleBtn) {
+            toggleMarbleBtn.addEventListener("click", () => {
+                marbleOverlay.style.display = "block";
+                marbleIframe.src = marbleSrc; // Set the iframe's src to start the game
+            });
+        }
+
+        if (closeMarbleBtn) {
+            closeMarbleBtn.addEventListener("click", () => {
+                marbleOverlay.style.display = "none";
+                marbleIframe.src = ""; // Clear the iframe's src to stop the game
+            });
+        }
+
+        const birdOverlay = document.getElementById("bird-overlay");
+        const toggleBirdBtn = document.getElementById("toggle-bird-btn");
+        const closeBirdBtn = document.getElementById("close-bird-btn");
+
+        if (toggleBirdBtn) {
+            toggleBirdBtn.addEventListener("click", () => {
+                birdOverlay.style.display = "block";
+            });
+        }
+
+        if (closeBirdBtn) {
+            closeBirdBtn.addEventListener("click", () => {
+                birdOverlay.style.display = "none";
+            });
+        }
+
+        // Flappy Bird Game Logic
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.src = "https://i.ibb.co/Q9yv5Jk/flappy-bird-set.png";
+
+        let gamePlaying = false;
+        const gravity = 0.2;
+        const speed = 3;
+        const size = [51, 36];
+        const jump = -6.5;
+        const cTenth = (canvas.width / 10);
+
+        let index = 0, bestScore = 0, flight, flyHeight, currentScore, pipes;
+
+        const pipeWidth = 78;
+        const pipeGap = 270;
+        const pipeLoc = () => (Math.random() * ((canvas.height - (pipeGap + pipeWidth)) - pipeWidth)) + pipeWidth;
+
+        const setup = () => {
+            currentScore = 0;
+            flight = jump;
+            flyHeight = (canvas.height / 2) - (size[1] / 2);
+            pipes = Array(3).fill().map((_, i) => [canvas.width + (i * (pipeGap + pipeWidth)), pipeLoc()]);
+        };
+
+        const render = () => {
+            index++;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height, -((index * (speed / 2)) % canvas.width) + canvas.width, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height, -(index * (speed / 2)) % canvas.width, 0, canvas.width, canvas.height);
+
+            if (gamePlaying) {
+                pipes.forEach(pipe => {
+                    pipe[0] -= speed;
+                    ctx.drawImage(img, 432, 588 - pipe[1], pipeWidth, pipe[1], pipe[0], 0, pipeWidth, pipe[1]);
+                    ctx.drawImage(img, 432 + pipeWidth, 108, pipeWidth, canvas.height - pipe[1] + pipeGap, pipe[0], pipe[1] + pipeGap, pipeWidth, canvas.height - pipe[1] + pipeGap);
+
+                    if (pipe[0] <= -pipeWidth) {
+                        currentScore++;
+                        bestScore = Math.max(bestScore, currentScore);
+                        pipes = [...pipes.slice(1), [pipes[pipes.length - 1][0] + pipeGap + pipeWidth, pipeLoc()]];
+                    }
+
+                    if ([
+                        pipe[0] <= cTenth + size[0],
+                        pipe[0] + pipeWidth >= cTenth,
+                        pipe[1] > flyHeight || pipe[1] + pipeGap < flyHeight + size[1]
+                    ].every(Boolean)) {
+                        gamePlaying = false;
+                        setup();
+                    }
+                });
+            }
+
+            if (gamePlaying) {
+                ctx.drawImage(img, 432, Math.floor((index % 9) / 3) * size[1], ...size, cTenth, flyHeight, ...size);
+                flight += gravity;
+                flyHeight = Math.min(flyHeight + flight, canvas.height - size[1]);
+            } else {
+                ctx.drawImage(img, 432, Math.floor((index % 9) / 3) * size[1], ...size, (canvas.width / 2) - (size[0] / 2), flyHeight, ...size);
+                flyHeight = (canvas.height / 2) - (size[1] / 2);
+                ctx.fillText(`Best score : ${bestScore}`, 85, 245);
+                ctx.fillText('Click to play', 90, 535);
+                ctx.font = "bold 30px courier";
+            }
+
+            document.getElementById('bestScore').innerHTML = `Best : ${bestScore}`;
+            document.getElementById('currentScore').innerHTML = `Current : ${currentScore}`;
+            window.requestAnimationFrame(render);
+        };
+
+        setup();
+        img.onload = render;
+        document.addEventListener('click', () => gamePlaying = true);
+        window.onclick = () => flight = jump;
     });
 </script>
-

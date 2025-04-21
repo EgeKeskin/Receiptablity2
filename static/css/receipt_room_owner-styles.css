@@ -98,7 +98,7 @@ body, html {
     margin-bottom: 10px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center content horizontally */
+    align-items: center;
 }
 
 .instructions {
@@ -378,6 +378,30 @@ body, html {
 
 .button-wrapper {
     display: flex;
-    justify-content: center; /* Center the button horizontally */
+    justify-content: center;
     margin-top: 20px;
+}
+
+.receipt-edit-form input,
+.edit-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.3s, background 0.3s;
+}
+
+.receipt-edit-form input::placeholder,
+.edit-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.receipt-edit-form input:focus,
+.edit-input:focus {
+    border-color: white;
+    background: rgba(255, 255, 255, 0.3);
 }
