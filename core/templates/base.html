@@ -101,9 +101,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'eula' %}" title="EULA">EULA</a>
 
+                    {% block show_focus_mode %}{% endblock %}
+                    {% if show_focus_mode == "True" %}
                     <li class="nav-item">
                         <button id="toggle-video-btn" class="custom-btn btn-focus ms-2">Focus Mode</button>
                     </li>
+                    {% endif %}
                     <li class="nav-item">
                         <button id="toggle-game-btn" class="custom-btn btn-focus-plus ms-2">Focus Mode++</button>
                     </li>
