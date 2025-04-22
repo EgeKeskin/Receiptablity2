@@ -87,6 +87,9 @@
     <div id="credit-text" style="display: none; position: fixed; bottom: 320px; right: 10px; color: white; font-family: 'Roboto', sans-serif; font-size: 0.9rem; text-align: center; z-index: 10000;">
         Credit goes to software engineer yell0wsuit for creating the source code
     </div>
+    <div id="flappy-credit-text" style="display: none; position: fixed; top: 830px; left: 10px; color: white; font-family: 'Roboto', sans-serif; font-size: 0.9rem; text-align: center; z-index: 10000;">
+        Credit for the source code for Flappy Bird goes to Julien Az on Code Pen
+    </div>
     <audio id="subway-surfers-music" loop preload="auto" style="display: none;">
         <source src="{% static 'games/subway-surfers/audio/theme.mp3' %}" type="audio/mpeg">
     </audio>
@@ -239,16 +242,19 @@
         const birdOverlay = document.getElementById("bird-overlay");
         const toggleBirdBtn = document.getElementById("toggle-bird-btn");
         const closeBirdBtn = document.getElementById("close-bird-btn");
+        const flappyCreditText = document.getElementById("flappy-credit-text");
 
         if (toggleBirdBtn) {
             toggleBirdBtn.addEventListener("click", () => {
                 birdOverlay.style.display = "block";
+                flappyCreditText.style.display = "block";
             });
         }
 
         if (closeBirdBtn) {
             closeBirdBtn.addEventListener("click", () => {
                 birdOverlay.style.display = "none";
+                flappyCreditText.style.display = "none";
             });
         }
 
