@@ -32,6 +32,15 @@ body, html {
     z-index: 100;
 }
 
+/* Override custom button styles for navbar buttons only */
+.navbar .custom-btn {
+    display: inline-block;
+    width: auto;
+    padding: 8px 15px;
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
 video {
     position: fixed;  /* Ensure the video is fixed to the background */
     top: 0;           /* Start at the top of the page */
