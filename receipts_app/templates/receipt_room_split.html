@@ -45,6 +45,78 @@
   .close-btn:hover {
     color: #000;
   }
+
+  /* Added modern input styling */
+  .upload-label {
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    display: block;
+    text-align: left;
+  }
+
+  .upload-input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    outline: none;
+    transition: background 0.3s;
+  }
+  
+  .upload-input:focus {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  
+  .upload-input::placeholder {
+    color: white;
+    opacity: 1;
+  }
+
+  /* Button style improvements */
+  .confirm-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    padding: 16px 28px;
+    font-size: 1.2rem;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    background: rgba(34, 34, 34, 0.7);
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    width: auto;
+    min-width: 250px;
+    outline: none;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    backdrop-filter: blur(8px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .confirm-btn:hover {
+    background: rgba(51, 51, 51, 0.85);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+  }
+
+  .button-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .input-group {
+    margin-top: 15px;
+  }
 </style>
 {% endblock %}
 
@@ -53,9 +125,9 @@
   <div class="receipt-room-card">
     <h1 class="receipt-room-header">{{ receipt.name }}</h1>
     <div class="receipt-room-details">
-      <p><strong>Total Cost:</strong> {{ receipt.total_cost }}</p>
-      <p><strong>Taxes:</strong> {{ receipt.taxes }}</p>
-      <p><strong>Tip:</strong> {{ receipt.tip }}</p>
+      <p><strong>Total Cost:</strong> $<span id="total-cost">{{ receipt.total_cost }}</span></p>
+      <p><strong>Taxes:</strong> ${{ receipt.taxes }}</p>
+      <p><strong>Tip:</strong> ${{ receipt.tip }}</p>
       <p><strong>Uploaded at:</strong> {{ receipt.uploaded_at }}</p>
     </div>
 
@@ -68,8 +140,7 @@
           <li class="receipt-room-item">
             <div class="item-container">
               <div class="item-details">
-                <p><strong>Item Name:</strong> {{ item.item_name }}</p>
-                <p><strong>Item Cost:</strong> {{ item.item_cost }}</p>
+                <p class="item-name">{{ item.item_name }} - ${{ item.item_cost }}</p>
               </div>
             </div>
           </li>
@@ -83,7 +154,9 @@
           <label class="upload-label" for="numPeopleInput">How many people?</label>
           <input type="number" id="numPeopleInput" class="upload-input" placeholder="e.g. 3" min="1" required>
         </div>
-        <button type="submit" class="confirm-btn mt-3">Split Evenly</button>
+        <div class="button-wrapper">
+          <button type="submit" class="confirm-btn mt-3">Split Evenly</button>
+        </div>
       </form>
     {% else %}
       <p class="receipt-room-details">No items available.</p>
