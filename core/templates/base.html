@@ -87,9 +87,12 @@
     <div id="credit-text" style="display: none; position: fixed; bottom: 320px; right: 10px; color: white; font-family: 'Roboto', sans-serif; font-size: 0.9rem; text-align: center; z-index: 10000;">
         Credit goes to software engineer yell0wsuit for creating the source code
     </div>
+    <audio id="subway-surfers-music" loop preload="auto" style="display: none;">
+        <source src="{% static 'games/subway-surfers/audio/theme.mp3' %}" type="audio/mpeg">
+    </audio>
     <div id="game-overlay" style="display: none; position: fixed; bottom: 10px; right: 10px; width: 400px; height: 300px; background: rgba(0, 0, 0, 0.8); border: 2px solid white; border-radius: 10px; z-index: 9999; overflow: hidden;">
         <button id="close-game-btn" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer; z-index: 10000;">X</button>
-        <iframe src="{% static 'games/subway-surfers/index.html' %}" title="Subway Surfers Game" style="width: 100%; height: 100%; border: none;"></iframe>
+        <iframe id="subway-iframe" title="Subway Surfers Game" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
     <div id="marble-overlay" style="display: none; position: fixed; bottom: 10px; left: 10px; width: 400px; height: 300px; background: rgba(0, 0, 0, 0.8); border: 2px solid white; border-radius: 10px; z-index: 9999; overflow: hidden;">
@@ -157,22 +160,48 @@
         const gameIframe = gameOverlay.querySelector("iframe");
         const creditText = document.getElementById("credit-text");
         const gameSrc = "{% static 'games/subway-surfers/index.html' %}"; 
+        const subwayMusic = document.getElementById("subway-surfers-music");
 
         // Check localStorage for overlay state
         const overlayState = localStorage.getItem("gameOverlayVisible");
+        const musicState = localStorage.getItem("subwayMusicPlaying");
 
         if (overlayState === "true") {
             gameOverlay.style.display = "block";
             creditText.style.display = "block";
             gameIframe.src = gameSrc; // Restore the game iframe
+            
+            // Only play music if it was previously playing
+            if (musicState === "true") {
+                subwayMusic.play();
+            }
         }
 
+        // Toggle functionality for the Focus Mode++ button
         if (toggleGameBtn) {
             toggleGameBtn.addEventListener("click", () => {
-                gameOverlay.style.display = "block";
-                creditText.style.display = "block"; // Show the credit text
-                gameIframe.src = gameSrc; // Set the iframe's src to start the game
-                localStorage.setItem("gameOverlayVisible", "true"); // Save state in localStorage
+                const isOverlayVisible = gameOverlay.style.display === "block";
+                const isMusicPlaying = !subwayMusic.paused;
+                
+                if (isOverlayVisible) {
+                    // If overlay is already visible, toggle just the music
+                    if (isMusicPlaying) {
+                        subwayMusic.pause();
+                        subwayMusic.currentTime = 0;
+                        localStorage.setItem("subwayMusicPlaying", "false");
+                    } else {
+                        subwayMusic.play();
+                        localStorage.setItem("subwayMusicPlaying", "true");
+                    }
+                } else {
+                    // If overlay is not visible, show it and start the music
+                    gameOverlay.style.display = "block";
+                    creditText.style.display = "block";
+                    gameIframe.src = gameSrc;
+                    subwayMusic.play();
+                    localStorage.setItem("gameOverlayVisible", "true");
+                    localStorage.setItem("subwayMusicPlaying", "true");
+                }
             });
         }
 
@@ -181,6 +210,8 @@
                 gameOverlay.style.display = "none";
                 creditText.style.display = "none"; // Hide the credit text
                 gameIframe.src = ""; // Clear the iframe's src to stop the game
+                subwayMusic.pause(); // Pause the music
+                subwayMusic.currentTime = 0; // Reset the music
                 localStorage.setItem("gameOverlayVisible", "false"); // Save state in localStorage
             });
         }
