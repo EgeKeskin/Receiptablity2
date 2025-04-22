@@ -24,6 +24,45 @@
         .info-icon:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
+        
+        /* Custom button styles for consistent styling across pages */
+        .custom-btn {
+            display: inline-block;
+            text-align: center;
+            padding: 8px 15px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
+            color: white;
+            text-decoration: none;
+            border: none;
+        }
+        
+        .btn-focus {
+            background-color: #293E52;
+        }
+        .btn-focus:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05);
+        }
+        
+        .btn-focus-plus {
+            background-color: #4C637C;
+        }
+        .btn-focus-plus:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05);
+        }
+        
+        .btn-bird {
+            background-color: #7A8E9D;
+        }
+        .btn-bird:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05);
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -63,17 +102,17 @@
                         <a class="nav-link" href="{% url 'eula' %}" title="EULA">EULA</a>
 
                     <li class="nav-item">
-                        <button id="toggle-video-btn" class="btn btn-outline-light ms-2">Focus Mode</button>
+                        <button id="toggle-video-btn" class="custom-btn btn-focus ms-2">Focus Mode</button>
                     </li>
                     <li class="nav-item">
-                        <button id="toggle-game-btn" class="btn btn-outline-light ms-2">Focus Mode++</button>
+                        <button id="toggle-game-btn" class="custom-btn btn-focus-plus ms-2">Focus Mode++</button>
                     </li>
                     <!-- Removing throwback MBG because it takes too long to load and is unecessary -->
                     <!-- <li class="nav-item">
-                        <button id="toggle-marble-btn" class="btn btn-outline-light ms-2">Throwback</button>
+                        <button id="toggle-marble-btn" class="custom-btn btn-steel ms-2">Throwback</button>
                     </li> -->
                     <li class="nav-item">
-                        <button id="toggle-bird-btn" class="btn btn-outline-light ms-2">Bird</button>
+                        <button id="toggle-bird-btn" class="custom-btn btn-bird ms-2">Bird</button>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link ms-3" href="{% url 'profile' %}" title="Profile">
