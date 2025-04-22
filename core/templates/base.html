@@ -62,9 +62,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'eula' %}" title="EULA">EULA</a>
 
+                    {% if request.resolver_match.url_name == 'create-room' %}
                     <li class="nav-item">
                         <button id="toggle-video-btn" class="btn btn-outline-light ms-2">Focus Mode</button>
                     </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
