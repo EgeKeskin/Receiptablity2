@@ -24,6 +24,45 @@
         .info-icon:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
+        
+        /* Custom button styles for consistent styling across pages */
+        .custom-btn {
+            display: inline-block;
+            text-align: center;
+            padding: 8px 15px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
+            color: white;
+            text-decoration: none;
+            border: none;
+        }
+        
+        .btn-focus {
+            background-color: #293E52;
+        }
+        .btn-focus:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05);
+        }
+        
+        .btn-focus-plus {
+            background-color: #4C637C;
+        }
+        .btn-focus-plus:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05);
+        }
+        
+        .btn-bird {
+            background-color: #7A8E9D;
+        }
+        .btn-bird:hover {
+            filter: brightness(1.1);
+            transform: scale(1.05);
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -62,17 +101,21 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'eula' %}" title="EULA">EULA</a>
 
+                    {% block show_focus_mode %}{% endblock %}
+                    {% if show_focus_mode == "True" %}
                     <li class="nav-item">
-                        <button id="toggle-video-btn" class="btn btn-outline-light ms-2">Focus Mode</button>
+                        <button id="toggle-video-btn" class="custom-btn btn-focus ms-2">Focus Mode</button>
                     </li>
+                    {% endif %}
                     <li class="nav-item">
-                        <button id="toggle-game-btn" class="btn btn-outline-light ms-2">Focus Mode++</button>
+                        <button id="toggle-game-btn" class="custom-btn btn-focus-plus ms-2">Focus Mode++</button>
                     </li>
+                    <!-- Removing throwback MBG because it takes too long to load and is unecessary -->
+                    <!-- <li class="nav-item">
+                        <button id="toggle-marble-btn" class="custom-btn btn-steel ms-2">Throwback</button>
+                    </li> -->
                     <li class="nav-item">
-                        <button id="toggle-marble-btn" class="btn btn-outline-light ms-2">Throwback</button>
-                    </li>
-                    <li class="nav-item">
-                        <button id="toggle-bird-btn" class="btn btn-outline-light ms-2">Bird</button>
+                        <button id="toggle-bird-btn" class="custom-btn btn-bird ms-2">Bird</button>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link ms-3" href="{% url 'profile' %}" title="Profile">
@@ -87,9 +130,15 @@
     <div id="credit-text" style="display: none; position: fixed; bottom: 320px; right: 10px; color: white; font-family: 'Roboto', sans-serif; font-size: 0.9rem; text-align: center; z-index: 10000;">
         Credit goes to software engineer yell0wsuit for creating the source code
     </div>
+    <div id="flappy-credit-text" style="display: none; position: fixed; top: 830px; left: 10px; color: white; font-family: 'Roboto', sans-serif; font-size: 0.9rem; text-align: center; z-index: 10000;">
+        Credit for the source code for Flappy Bird goes to Julien Az on Code Pen
+    </div>
+    <audio id="subway-surfers-music" loop preload="auto" style="display: none;">
+        <source src="{% static 'games/subway-surfers/audio/theme.mp3' %}" type="audio/mpeg">
+    </audio>
     <div id="game-overlay" style="display: none; position: fixed; bottom: 10px; right: 10px; width: 400px; height: 300px; background: rgba(0, 0, 0, 0.8); border: 2px solid white; border-radius: 10px; z-index: 9999; overflow: hidden;">
         <button id="close-game-btn" style="position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer; z-index: 10000;">X</button>
-        <iframe src="{% static 'games/subway-surfers/index.html' %}" title="Subway Surfers Game" style="width: 100%; height: 100%; border: none;"></iframe>
+        <iframe id="subway-iframe" title="Subway Surfers Game" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
     <div id="marble-overlay" style="display: none; position: fixed; bottom: 10px; left: 10px; width: 400px; height: 300px; background: rgba(0, 0, 0, 0.8); border: 2px solid white; border-radius: 10px; z-index: 9999; overflow: hidden;">
@@ -157,22 +206,48 @@
         const gameIframe = gameOverlay.querySelector("iframe");
         const creditText = document.getElementById("credit-text");
         const gameSrc = "{% static 'games/subway-surfers/index.html' %}"; 
+        const subwayMusic = document.getElementById("subway-surfers-music");
 
         // Check localStorage for overlay state
         const overlayState = localStorage.getItem("gameOverlayVisible");
+        const musicState = localStorage.getItem("subwayMusicPlaying");
 
         if (overlayState === "true") {
             gameOverlay.style.display = "block";
             creditText.style.display = "block";
             gameIframe.src = gameSrc; // Restore the game iframe
+            
+            // Only play music if it was previously playing
+            if (musicState === "true") {
+                subwayMusic.play();
+            }
         }
 
+        // Toggle functionality for the Focus Mode++ button
         if (toggleGameBtn) {
             toggleGameBtn.addEventListener("click", () => {
-                gameOverlay.style.display = "block";
-                creditText.style.display = "block"; // Show the credit text
-                gameIframe.src = gameSrc; // Set the iframe's src to start the game
-                localStorage.setItem("gameOverlayVisible", "true"); // Save state in localStorage
+                const isOverlayVisible = gameOverlay.style.display === "block";
+                const isMusicPlaying = !subwayMusic.paused;
+                
+                if (isOverlayVisible) {
+                    // If overlay is already visible, toggle just the music
+                    if (isMusicPlaying) {
+                        subwayMusic.pause();
+                        subwayMusic.currentTime = 0;
+                        localStorage.setItem("subwayMusicPlaying", "false");
+                    } else {
+                        subwayMusic.play();
+                        localStorage.setItem("subwayMusicPlaying", "true");
+                    }
+                } else {
+                    // If overlay is not visible, show it and start the music
+                    gameOverlay.style.display = "block";
+                    creditText.style.display = "block";
+                    gameIframe.src = gameSrc;
+                    subwayMusic.play();
+                    localStorage.setItem("gameOverlayVisible", "true");
+                    localStorage.setItem("subwayMusicPlaying", "true");
+                }
             });
         }
 
@@ -181,6 +256,8 @@
                 gameOverlay.style.display = "none";
                 creditText.style.display = "none"; // Hide the credit text
                 gameIframe.src = ""; // Clear the iframe's src to stop the game
+                subwayMusic.pause(); // Pause the music
+                subwayMusic.currentTime = 0; // Reset the music
                 localStorage.setItem("gameOverlayVisible", "false"); // Save state in localStorage
             });
         }
@@ -208,16 +285,19 @@
         const birdOverlay = document.getElementById("bird-overlay");
         const toggleBirdBtn = document.getElementById("toggle-bird-btn");
         const closeBirdBtn = document.getElementById("close-bird-btn");
+        const flappyCreditText = document.getElementById("flappy-credit-text");
 
         if (toggleBirdBtn) {
             toggleBirdBtn.addEventListener("click", () => {
                 birdOverlay.style.display = "block";
+                flappyCreditText.style.display = "block";
             });
         }
 
         if (closeBirdBtn) {
             closeBirdBtn.addEventListener("click", () => {
                 birdOverlay.style.display = "none";
+                flappyCreditText.style.display = "none";
             });
         }
 
